@@ -255,3 +255,261 @@ main .section.highlight {
   margin: 0;
   padding: 40px 0;
 }
+
+/* Hide wizard step tab indicators */
+.wizard-menu-items {
+  display: none !important;
+}
+
+/* HDFC brand colors */
+:root {
+  --button-primary-color: #004C8F;
+  --button-primary-hover-color: #00356e;
+  --form-wizard-number-color: #004C8F;
+  --link-color: #004C8F;
+  --link-hover-color: #00356e;
+}
+
+/* Edit Mobile Number — link style, not button */
+main .form .field-editMobileBtn button,
+main .form .field-editMobileBtn button:hover {
+  background: none !important;
+  border: none !important;
+  color: #004C8F !important;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  font-size: inherit;
+  width: auto !important;
+}
+
+/* ============================================
+   WELCOME PANEL — COUNTRY CODE + MOBILE
+   ============================================ */
+
+/* Remove gap so +91 and mobile input connect visually */
+.field-countrycodemobile {
+  gap: 0 !important;
+}
+
+.field-countrycode input {
+  border-radius: 0.25rem 0 0 0.25rem !important;
+  border-right: none !important;
+  text-align: center;
+  color: #131313;
+}
+
+.field-mobileno input {
+  border-radius: 0 0.25rem 0.25rem 0 !important;
+}
+
+/* ============================================
+   OTP PANEL — MASKED MOBILE ROW
+   ============================================ */
+
+/* Override grid with flex so text + value + button sit inline */
+.field-maskedmobilenumberwrapper {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  grid-column: span 12;
+}
+
+.field-maskedmobilenumberwrapper > .field-otptitletext,
+.field-maskedmobilenumberwrapper > .field-maskedmobile,
+.field-maskedmobilenumberwrapper > .field-editmobilebtn {
+  grid-column: unset !important;
+  flex: none;
+}
+
+/* maskedMobile renders as plain inline text */
+.field-maskedmobile label {
+  display: none;
+}
+
+.field-maskedmobile input {
+  border: none !important;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  height: auto;
+  font-weight: 600;
+  color: #131313;
+  pointer-events: none;
+  width: fit-content;
+}
+
+/* ============================================
+   OFFER DISPLAY — STRUCTURAL LEGENDS (HIDE)
+   ============================================ */
+
+.field-offerdisplayfragment > legend,
+.field-loan-offer-result-section > legend,
+.field-loan-offer-banner > legend,
+.field-loan-offer-two-column-layout > legend,
+.field-loan-controls-left > legend,
+.field-loan-summary-right > legend,
+.field-summary-metrics-grid > legend,
+.field-summary-disclaimer-footer > legend,
+.field-loan-amount-control > legend,
+.field-loan-tenure-control > legend {
+  display: none;
+}
+
+/* ============================================
+   OFFER DISPLAY — BANNER
+   ============================================ */
+
+.field-loan-offer-banner {
+  background: #ebf3ff;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  grid-column: span 12;
+}
+
+.field-loan-offer-banner > * {
+  grid-column: unset !important;
+}
+
+/* Banner icon — styled as plain emoji text, not an input */
+.field-offer-banner-icon label,
+.field-offer-banner-icon .field-description {
+  display: none;
+}
+
+.field-offer-banner-icon input {
+  border: none !important;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  height: auto;
+  font-size: 1.5rem;
+  width: 2rem;
+  pointer-events: none;
+}
+
+/* ============================================
+   OFFER DISPLAY — LOAN CONTROLS
+   ============================================ */
+
+/* Hide redundant slider labels (already shown as bold text above) */
+.field-loan-amount-slider-value > label,
+.field-loan-tenure-slider-value > label {
+  display: none;
+}
+
+/* Display amount/tenure — hide label, render value as plain text */
+.field-loan-amount-display label,
+.field-loan-tenure-display label {
+  display: none;
+}
+
+.field-loan-amount-display input,
+.field-loan-tenure-display input {
+  border: none !important;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  height: auto;
+  font-weight: 600;
+  color: #131313;
+  text-align: right;
+  pointer-events: none;
+}
+
+/* ============================================
+   OFFER DISPLAY — SUMMARY CARD
+   ============================================ */
+
+.field-loan-summary-right {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px 16px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+  align-self: start;
+}
+
+/* Summary amount — large prominent number */
+.field-summary-amount label {
+  display: none;
+}
+
+.field-summary-amount input {
+  border: none !important;
+  background: transparent;
+  padding: 0;
+  margin: 4px 0 8px;
+  height: auto;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #004c8f;
+  pointer-events: none;
+  width: 100%;
+}
+
+/* Metrics grid divider */
+.field-summary-metrics-grid {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+/* EMI / ROI / Taxes — small label, bold value */
+.field-emi-amount label,
+.field-rate-of-interest label,
+.field-taxes label {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.field-emi-amount input,
+.field-rate-of-interest input,
+.field-taxes input {
+  border: none !important;
+  background: transparent;
+  padding: 0;
+  margin: 2px 0 8px;
+  height: auto;
+  font-weight: 600;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+/* Disclaimer footer */
+.field-summary-disclaimer-footer {
+  background: #fffbf0;
+  border: 1px solid #ffe082;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-top: 12px;
+  display: flex !important;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.field-summary-disclaimer-footer > * {
+  grid-column: unset !important;
+}
+
+.field-disclaimer-icon label,
+.field-disclaimer-icon .field-description {
+  display: none;
+}
+
+.field-disclaimer-icon input {
+  border: none !important;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  height: auto;
+  width: 1.5rem;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
