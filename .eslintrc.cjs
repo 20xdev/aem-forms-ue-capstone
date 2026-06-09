@@ -23,7 +23,8 @@ module.exports = {
     }],
     'xwalk/max-cells': ['error', {
       '*': 4, // default limit for all models
-      form: 16,
+      'card-choice': 20,
+      form: 17,
       wizard: 12,
       'form-button': 7,
       'checkbox-group': 20,

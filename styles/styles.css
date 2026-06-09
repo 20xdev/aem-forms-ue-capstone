@@ -16,8 +16,8 @@
   --light-color: #f8f8f8;
   --dark-color: #505050;
   --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
+  --link-color: #004c8f;
+  --link-hover-color: #00356e;
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback, sans-serif;
@@ -38,6 +38,11 @@
 
   /* nav height */
   --nav-height: 64px;
+
+  /* HDFC brand colors */
+  --button-primary-color: #004c8f;
+  --button-primary-hover-color: #00356e;
+  --form-wizard-number-color: #004c8f;
 }
 
 /* fallback fonts */
@@ -261,21 +266,12 @@ main .section.highlight {
   display: none !important;
 }
 
-/* HDFC brand colors */
-:root {
-  --button-primary-color: #004C8F;
-  --button-primary-hover-color: #00356e;
-  --form-wizard-number-color: #004C8F;
-  --link-color: #004C8F;
-  --link-hover-color: #00356e;
-}
-
 /* Edit Mobile Number — link style, not button */
-main .form .field-editMobileBtn button,
-main .form .field-editMobileBtn button:hover {
+main .form .field-editmobilebtn button,
+main .form .field-editmobilebtn button:hover {
   background: none !important;
   border: none !important;
-  color: #004C8F !important;
+  color: #004c8f !important;
   cursor: pointer;
   padding: 0;
   text-decoration: underline;
