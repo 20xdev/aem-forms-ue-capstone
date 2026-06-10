@@ -79,7 +79,7 @@ function initiateCustomerIdentification(mobileNo, identifierName, identifierValu
       fillerFields: {},
     },
   };
-  return fetch(`${MOCK_API_BASE_URL}/initiateCustomerIdentification`, {
+  fetch(`${MOCK_API_BASE_URL}/initiateCustomerIdentification`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -90,15 +90,14 @@ function initiateCustomerIdentification(mobileNo, identifierName, identifierValu
         globals.functions.setProperty('offerAvailable', { value: data.responseString.offerAvailable });
         globals.functions.setProperty('existingCustomer', { value: data.responseString.existingCustomer });
         globals.functions.setProperty('bankJourneyID', { value: data.contextParam.bankJourneyID });
-        return data;
+      } else {
+        globals.functions.setProperty('apiError', { value: data.status.errorDesc });
       }
-      globals.functions.setProperty('apiError', { value: data.status.errorDesc });
-      return null;
     })
     .catch(() => {
       globals.functions.setProperty('apiError', { value: 'Unable to reach server. Please try again.' });
-      return null;
     });
+  return '';
 }
 
 /**
@@ -117,7 +116,7 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
       fillerFields: {},
     },
   };
-  return fetch(`${MOCK_API_BASE_URL}/verifyOTPAndGetDemogDetails`, {
+  fetch(`${MOCK_API_BASE_URL}/verifyOTPAndGetDemogDetails`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -139,15 +138,14 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
           globals.functions.setProperty('customerID', { value: customer.customerID });
           globals.functions.setProperty('accountNumber', { value: customer.accountNumber });
         }
-        return data;
+      } else {
+        globals.functions.setProperty('otpError', { value: data.status.errorDesc });
       }
-      globals.functions.setProperty('otpError', { value: data.status.errorDesc });
-      return null;
     })
     .catch(() => {
       globals.functions.setProperty('otpError', { value: 'OTP verification failed. Please try again.' });
-      return null;
     });
+  return '';
 }
 
 /**
@@ -189,7 +187,7 @@ function submitLoanApplication(globals) {
       fillerFields: {},
     },
   };
-  return fetch(`${MOCK_API_BASE_URL}/submitLoanApplication`, {
+  fetch(`${MOCK_API_BASE_URL}/submitLoanApplication`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -198,15 +196,14 @@ function submitLoanApplication(globals) {
     .then((result) => {
       if (result?.status?.responseCode === '0') {
         globals.functions.setProperty('acknowledgementId', { value: result.responseString.acknowledgementId });
-        return result;
+      } else {
+        globals.functions.setProperty('apiError', { value: result.status.errorDesc });
       }
-      globals.functions.setProperty('apiError', { value: result.status.errorDesc });
-      return null;
     })
     .catch(() => {
       globals.functions.setProperty('apiError', { value: 'Loan submission failed. Please try again.' });
-      return null;
     });
+  return '';
 }
 
 // eslint-disable-next-line import/prefer-default-export
