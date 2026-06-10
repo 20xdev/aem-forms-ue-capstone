@@ -286,27 +286,27 @@ main .form .field-editmobilebtn button:hover {
 /* Country code + mobile: connected pill, inputs bottom-aligned */
 .field-countrycodemobile {
   display: flex !important;
-  align-items: stretch !important;
+  align-items: flex-end;
+  flex-wrap: nowrap;
   gap: 0 !important;
 }
 
-/* Push country code input to bottom so it lines up with mobile input */
+/* Fixed narrow width — prevents expanding to full-row width */
 .field-countrycode {
-  flex: 0 0 auto;
-  display: flex !important;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
-.field-mobileno {
-  flex: 1 1 auto;
+  flex: 0 0 72px;
 }
 
 .field-countrycode input {
+  width: 72px;
   border-radius: 0.25rem 0 0 0.25rem !important;
   border-right: none !important;
   text-align: center;
   color: #131313;
+}
+
+.field-mobileno {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .field-mobileno input {
