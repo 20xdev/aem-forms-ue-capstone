@@ -27,7 +27,6 @@ let submitBaseUrl = '';
 
 export const SUBMISSION_SERVICE = 'https://forms.adobe.com/adobe/forms/af/submit/';
 
-
 export function setSubmitBaseUrl(url) {
   submitBaseUrl = url;
 }
