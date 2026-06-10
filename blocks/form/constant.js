@@ -27,15 +27,6 @@ let submitBaseUrl = '';
 
 export const SUBMISSION_SERVICE = 'https://forms.adobe.com/adobe/forms/af/submit/';
 
-export const MOCK_API_BASE_URL = 'https://mock-apis-g29l.onrender.com';
-
-export const CONTEXT_PARAM = {
-  partnerID: 'HDFCBANK',
-  channelID: 'ADOBE',
-  productName: 'PL',
-  partnerJourneyID: '160120221234567890',
-  bankJourneyID: '20211601234567890',
-};
 
 export function setSubmitBaseUrl(url) {
   submitBaseUrl = url;

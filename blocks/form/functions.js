@@ -1,4 +1,11 @@
-import { MOCK_API_BASE_URL, CONTEXT_PARAM } from './constant.js';
+const MOCK_API_BASE_URL = 'https://mock-apis-g29l.onrender.com';
+const CONTEXT_PARAM = {
+  partnerID: 'HDFCBANK',
+  channelID: 'ADOBE',
+  productName: 'PL',
+  partnerJourneyID: '160120221234567890',
+  bankJourneyID: '20211601234567890',
+};
 
 /**
  * Get Full Name
