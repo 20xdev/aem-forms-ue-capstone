@@ -26,6 +26,7 @@ module.exports = {
       'card-choice': 20,
       form: 17,
       wizard: 12,
+      'loan-wizard': 12,
       'form-button': 7,
       'checkbox-group': 20,
       checkbox: 19,
