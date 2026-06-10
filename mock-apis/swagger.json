@@ -1,0 +1,734 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AEM Forms EDS Capstone – Loan Journey APIs",
+    "description": "Mock API definitions for the End-to-End Personal Loan Journey capstone. Covers Tier 1 (mandatory) and Tier 2 (integration) APIs. Partner: HDFCBANK, Channel: ADOBE, Product: PL.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://mock-apis-g29l.onrender.com",
+      "description": "Production mock server (render.com)"
+    },
+    {
+      "url": "http://localhost:3003",
+      "description": "Local Mockoon server"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "ContextParam": {
+        "type": "object",
+        "properties": {
+          "partnerID": { "type": "string", "example": "HDFCBANK" },
+          "channelID": { "type": "string", "example": "ADOBE" },
+          "productName": { "type": "string", "example": "PL" },
+          "partnerJourneyID": { "type": "string", "example": "160120221234567890" },
+          "bankJourneyID": { "type": "string", "example": "20211601234567890" }
+        }
+      },
+      "FillerFields": {
+        "type": "object",
+        "properties": {
+          "filler1": { "type": "string", "default": "" },
+          "filler2": { "type": "string", "default": "" },
+          "filler3": { "type": "string", "default": "" },
+          "filler4": { "type": "string", "default": "" },
+          "filler5": { "type": "string", "default": "" },
+          "filler6": { "type": "string", "default": "" },
+          "filler7": { "type": "string", "default": "" },
+          "filler8": { "type": "string", "default": "" },
+          "filler9": { "type": "string", "default": "" },
+          "filler10": { "type": "string", "default": "" }
+        }
+      },
+      "ApiStatus": {
+        "type": "object",
+        "properties": {
+          "responseCode": { "type": "string", "example": "0", "description": "0 = success" },
+          "errorCode": { "type": "string", "example": "" },
+          "errorDesc": { "type": "string", "example": "" }
+        }
+      },
+      "ApiStatusError": {
+        "type": "object",
+        "properties": {
+          "responseCode": { "type": "string", "example": "1" },
+          "errorCode": { "type": "string", "example": "ERR_001" },
+          "errorDesc": { "type": "string", "example": "Invalid OTP" }
+        }
+      },
+      "CustomerDemogDetail": {
+        "type": "object",
+        "properties": {
+          "customerFirstName": { "type": "string", "example": "Ankit" },
+          "customerMiddleName": { "type": "string", "example": "" },
+          "customerLastName": { "type": "string", "example": "Shah" },
+          "customerAddress1": { "type": "string", "example": "1301, Barkha" },
+          "customerAddress2": { "type": "string", "example": "Opposite Brigh School, Village Road" },
+          "customerAddress3": { "type": "string", "example": "" },
+          "customerState": { "type": "string", "example": "Maharashtra" },
+          "customerCity": { "type": "string", "example": "Mumbai" },
+          "zipCode": { "type": "string", "example": "400016" },
+          "customerCountry": { "type": "string", "example": "India" },
+          "customerGender": { "type": "string", "example": "M" },
+          "dateOfBirth": { "type": "string", "example": "27-02-1987" },
+          "emailAddress": { "type": "string", "example": "ankit@gmail.com" },
+          "customerOfficeAddress1": { "type": "string", "example": "" },
+          "customerOfficeAddress2": { "type": "string", "example": "" },
+          "customerOfficeAddress3": { "type": "string", "example": "" },
+          "customerOfficeCity": { "type": "string", "example": "" },
+          "customerOfficeZipCode": { "type": "string", "example": "" },
+          "customerMobileNo": { "type": "string", "example": "9870926612" },
+          "monthlyIncome": { "type": "string", "example": "" },
+          "profession": { "type": "string", "example": "" },
+          "residenceType": { "type": "string", "example": "" },
+          "offerType": { "type": "string", "example": "LG_HNW_PL_PQ_NB_FEB22" },
+          "offerAmount": { "type": "string", "example": "1000000.00" },
+          "tenure": { "type": "string", "example": "36" },
+          "rateOfInterest": { "type": "string", "example": "10.20%" },
+          "kycFlag": { "type": "string", "example": "Y" },
+          "custType": { "type": "string", "example": "F" },
+          "reltype": { "type": "string", "example": "AUS" },
+          "accountNumber": { "type": "string", "example": "XXXXXX5015" },
+          "customerID": { "type": "string", "example": "XXXX124" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/initiateCustomerIdentification": {
+      "post": {
+        "summary": "Initiate Customer Identification",
+        "description": "Tier 1 – Called on Welcome page submit. Sends mobile number + identifier (PAN or DOB) to check if customer has an offer available.",
+        "tags": ["Tier 1 – Foundation"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contextParam": {
+                    "allOf": [{ "$ref": "#/components/schemas/ContextParam" }],
+                    "properties": {
+                      "partnerID": { "example": "HDFCBANK" },
+                      "channelID": { "example": "ADOBE" }
+                    }
+                  },
+                  "requestString": {
+                    "type": "object",
+                    "properties": {
+                      "mobileNo": { "type": "string", "example": "9870926612" },
+                      "identifierName": {
+                        "type": "string",
+                        "enum": ["PAN_NO", "DOB"],
+                        "example": "PAN_NO"
+                      },
+                      "identifierValue": { "type": "string", "example": "ATIPA5141K" },
+                      "msgType": { "type": "string", "example": "S" },
+                      "fillerFields": { "$ref": "#/components/schemas/FillerFields" }
+                    },
+                    "required": ["mobileNo", "identifierName", "identifierValue"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success – Offer available for existing customer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                    "responseString": {
+                      "type": "object",
+                      "properties": {
+                        "offerAvailable": { "type": "string", "example": "Y", "description": "Y = offer exists, N = no offer" },
+                        "existingCustomer": { "type": "string", "example": "Y", "description": "Y = ETB customer, N = NTB" }
+                      }
+                    },
+                    "status": { "$ref": "#/components/schemas/ApiStatus" }
+                  }
+                },
+                "examples": {
+                  "offerAvailable": {
+                    "summary": "Offer available – existing customer",
+                    "value": {
+                      "contextParam": {
+                        "partnerID": "HDFCBANK",
+                        "channelID": "ADOBE",
+                        "productName": "PL",
+                        "partnerJourneyID": "160120221234567890",
+                        "bankJourneyID": "20211601234567890"
+                      },
+                      "responseString": {
+                        "offerAvailable": "Y",
+                        "existingCustomer": "Y"
+                      },
+                      "status": {
+                        "responseCode": "0",
+                        "errorCode": "",
+                        "errorDesc": ""
+                      }
+                    }
+                  },
+                  "noOffer": {
+                    "summary": "No offer available",
+                    "value": {
+                      "contextParam": {
+                        "partnerID": "HDFCBANK",
+                        "channelID": "ADOBE",
+                        "productName": "PL",
+                        "partnerJourneyID": "160120221234567890",
+                        "bankJourneyID": "20211601234567890"
+                      },
+                      "responseString": {
+                        "offerAvailable": "N",
+                        "existingCustomer": "N"
+                      },
+                      "status": {
+                        "responseCode": "1",
+                        "errorCode": "ERR_002",
+                        "errorDesc": "No offer available for this customer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verifyOTPAndGetDemogDetails": {
+      "post": {
+        "summary": "Verify OTP and Get Demographic Details",
+        "description": "Tier 1 – Called on OTP page submit. Validates the OTP and returns customer demographic and offer details.",
+        "tags": ["Tier 1 – Foundation"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                  "requestString": {
+                    "type": "object",
+                    "properties": {
+                      "passwordValue": { "type": "string", "example": "123456", "description": "6-digit OTP entered by user" },
+                      "fillerFields": { "$ref": "#/components/schemas/FillerFields" }
+                    },
+                    "required": ["passwordValue"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP verified – customer demog and offer details returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                    "responseString": {
+                      "type": "object",
+                      "properties": {
+                        "OfferDemogDetails": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/CustomerDemogDetail" }
+                        }
+                      }
+                    },
+                    "status": { "$ref": "#/components/schemas/ApiStatus" }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "OTP valid – customer details returned",
+                    "value": {
+                      "contextParam": {
+                        "partnerID": "HDFCBANK",
+                        "channelID": "ADOBE",
+                        "productName": "PL",
+                        "partnerJourneyID": "160120221234567890",
+                        "bankJourneyID": "20211601234567890"
+                      },
+                      "responseString": {
+                        "OfferDemogDetails": [
+                          {
+                            "customerFirstName": "Ankit",
+                            "customerMiddleName": "Ramesh",
+                            "customerLastName": "Shah",
+                            "customerAddress1": "1301, Barkha",
+                            "customerAddress2": "Opposite Brigh School, Village Road",
+                            "customerAddress3": "",
+                            "customerState": "Maharashtra",
+                            "customerCity": "Mumbai",
+                            "zipCode": "400016",
+                            "customerCountry": "India",
+                            "customerGender": "M",
+                            "dateOfBirth": "27-02-1987",
+                            "emailAddress": "ankit@gmail.com",
+                            "customerOfficeAddress1": "",
+                            "customerOfficeAddress2": "",
+                            "customerOfficeAddress3": "",
+                            "customerOfficeCity": "",
+                            "customerOfficeZipCode": "",
+                            "customerMobileNo": "9870926612",
+                            "monthlyIncome": "",
+                            "profession": "",
+                            "residenceType": "",
+                            "offerType": "LG_HNW_PL_PQ_NB_FEB22",
+                            "offerAmount": "1000000.00",
+                            "tenure": "36",
+                            "rateOfInterest": "10.20%",
+                            "kycFlag": "Y",
+                            "custType": "F",
+                            "reltype": "AUS",
+                            "accountNumber": "XXXXXX5015",
+                            "customerID": "XXXX124"
+                          }
+                        ]
+                      },
+                      "status": {
+                        "responseCode": "0",
+                        "errorCode": "",
+                        "errorDesc": ""
+                      }
+                    }
+                  },
+                  "invalidOTP": {
+                    "summary": "OTP invalid – failure response",
+                    "value": {
+                      "contextParam": {
+                        "partnerID": "HDFCBANK",
+                        "channelID": "ADOBE",
+                        "productName": "PL",
+                        "partnerJourneyID": "160120221234567890",
+                        "bankJourneyID": "20211601234567890"
+                      },
+                      "responseString": {},
+                      "status": {
+                        "responseCode": "1",
+                        "errorCode": "ERR_OTP_001",
+                        "errorDesc": "Invalid OTP. Please try again."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panEnquiry": {
+      "post": {
+        "summary": "PAN Enquiry",
+        "description": "Tier 2 – Validates PAN details for the customer during the personal info step.",
+        "tags": ["Tier 2 – Integration"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                  "requestString": {
+                    "type": "object",
+                    "properties": {
+                      "panNumber": { "type": "string", "example": "ATIPA5141K" },
+                      "dateOfBirth": { "type": "string", "example": "27-02-1987" },
+                      "fillerFields": { "$ref": "#/components/schemas/FillerFields" }
+                    },
+                    "required": ["panNumber"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PAN verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                    "responseString": {
+                      "type": "object",
+                      "properties": {
+                        "panVerified": { "type": "string", "example": "Y" },
+                        "nameAsPerPAN": { "type": "string", "example": "ANKIT RAMESH SHAH" }
+                      }
+                    },
+                    "status": { "$ref": "#/components/schemas/ApiStatus" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getBureauOffer": {
+      "post": {
+        "summary": "Get Bureau Offer",
+        "description": "Tier 2 – Fetches credit bureau-based loan offer after personal info is submitted. Returns updated offer amount and customer details.",
+        "tags": ["Tier 2 – Integration"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contextParam": {
+                    "type": "object",
+                    "properties": {
+                      "partnerID": { "type": "string", "example": "HDFCBANK" },
+                      "channelID": { "type": "string", "example": "ADOBE" },
+                      "productName": { "type": "string", "example": "PL" },
+                      "partnerJourneyId": { "type": "string", "example": "123456" },
+                      "bankJourneyId": { "type": "string", "example": "45678900" }
+                    }
+                  },
+                  "requestString": {
+                    "type": "object",
+                    "properties": {
+                      "salutation": { "type": "string", "example": "" },
+                      "firstName": { "type": "string", "example": "Ankit" },
+                      "middleName": { "type": "string", "example": "Ramesh" },
+                      "lastName": { "type": "string", "example": "Shah" },
+                      "dob": { "type": "string", "example": "27/02/1987" },
+                      "gender": { "type": "string", "example": "male" },
+                      "employmentType": { "type": "string", "example": "SEB", "description": "SEB = Self Employed Business" },
+                      "gstnID": { "type": "string", "example": "15AAAAM3546M21" },
+                      "resiAddressLine1": { "type": "string", "example": "" },
+                      "resiAddressLine2": { "type": "string", "example": "" },
+                      "resiAddressLine3": { "type": "string", "example": "" },
+                      "resiAddressCity": { "type": "string", "example": "Mumbai" },
+                      "resiAddressState": { "type": "string", "example": "Maharashtra" },
+                      "resiPincode": { "type": "string", "example": "400079" },
+                      "accountNumber": { "type": "string", "example": "XX42152" },
+                      "customerID": { "type": "string", "example": "XX12345" },
+                      "assistedJourney": { "type": "string", "example": "" },
+                      "channel": { "type": "string", "example": "" },
+                      "branchCode": { "type": "string", "example": "" },
+                      "agentCode": { "type": "string", "example": "" },
+                      "smCode": { "type": "string", "example": "" },
+                      "seCode": { "type": "string", "example": "" },
+                      "lgCode": { "type": "string", "example": "" },
+                      "lcCode": { "type": "string", "example": "" },
+                      "crmPromoCode": { "type": "string", "example": "" },
+                      "fillerFields": { "$ref": "#/components/schemas/FillerFields" }
+                    },
+                    "required": ["firstName", "lastName", "dob", "gender", "employmentType"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bureau offer retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                    "responseParam": {
+                      "type": "object",
+                      "properties": {
+                        "action": { "type": "string", "example": "GetBureauOffer" }
+                      }
+                    },
+                    "responseString": {
+                      "allOf": [{ "$ref": "#/components/schemas/CustomerDemogDetail" }]
+                    },
+                    "status": { "$ref": "#/components/schemas/ApiStatus" }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Bureau offer available",
+                    "value": {
+                      "contextParam": {
+                        "partnerID": "HDFCBANK",
+                        "productName": "PL",
+                        "journeyID": "789456",
+                        "externalJourneyID": "7845895"
+                      },
+                      "responseParam": { "action": "GetBureauOffer" },
+                      "responseString": {
+                        "customerFirstName": "Ankit",
+                        "customerLastName": "Enterprises",
+                        "customerCity": "Mumbai",
+                        "customerState": "Maharashtra",
+                        "zipCode": "400016",
+                        "customerCountry": "India",
+                        "customerGender": "M",
+                        "dateOfBirth": "01-01-1900",
+                        "emailAddress": "ankit@gmail.com",
+                        "customerMobileNo": "98709212345",
+                        "offerType": "LG_HNW_BL_PQ_NB_FEB22",
+                        "offerAmount": "1000000.00",
+                        "tenure": "36",
+                        "rateOfInterest": "10.20%",
+                        "kycFlag": "Y",
+                        "accountNumber": "XX50151",
+                        "customerID": "XX12345"
+                      },
+                      "status": {
+                        "responseCode": "0",
+                        "errorCode": "",
+                        "errorDesc": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generateEmailOTP": {
+      "post": {
+        "summary": "Generate Email OTP",
+        "description": "Tier 2 – Sends an OTP to the customer's email address for verification on the personal info screen.",
+        "tags": ["Tier 2 – Integration"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                  "requestString": {
+                    "type": "object",
+                    "properties": {
+                      "emailAddress": { "type": "string", "example": "ankit@gmail.com" },
+                      "customerID": { "type": "string", "example": "XXXX124" },
+                      "fillerFields": { "$ref": "#/components/schemas/FillerFields" }
+                    },
+                    "required": ["emailAddress"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email OTP sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                    "responseString": {
+                      "type": "object",
+                      "properties": {
+                        "otpSent": { "type": "string", "example": "Y" },
+                        "maskedEmail": { "type": "string", "example": "an***@gmail.com" }
+                      }
+                    },
+                    "status": { "$ref": "#/components/schemas/ApiStatus" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validateEmailOTP": {
+      "post": {
+        "summary": "Validate Email OTP",
+        "description": "Tier 2 – Validates the OTP sent to the customer's email address.",
+        "tags": ["Tier 2 – Integration"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                  "requestString": {
+                    "type": "object",
+                    "properties": {
+                      "emailAddress": { "type": "string", "example": "ankit@gmail.com" },
+                      "otpValue": { "type": "string", "example": "123456" },
+                      "customerID": { "type": "string", "example": "XXXX124" },
+                      "fillerFields": { "$ref": "#/components/schemas/FillerFields" }
+                    },
+                    "required": ["emailAddress", "otpValue"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email OTP validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                    "responseString": {
+                      "type": "object",
+                      "properties": {
+                        "emailVerified": { "type": "string", "example": "Y" }
+                      }
+                    },
+                    "status": { "$ref": "#/components/schemas/ApiStatus" }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Email OTP valid",
+                    "value": {
+                      "responseString": { "emailVerified": "Y" },
+                      "status": { "responseCode": "0", "errorCode": "", "errorDesc": "" }
+                    }
+                  },
+                  "failure": {
+                    "summary": "Email OTP invalid",
+                    "value": {
+                      "responseString": { "emailVerified": "N" },
+                      "status": { "responseCode": "1", "errorCode": "ERR_EMAIL_OTP_001", "errorDesc": "Invalid email OTP" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/submitLoanApplication": {
+      "post": {
+        "summary": "Submit Loan Application",
+        "description": "Tier 1 & 2 – Final submission of the loan application. Called from the Preview/Review screen. Returns vKYC link and acknowledgement ID.",
+        "tags": ["Tier 1 – Foundation", "Tier 2 – Integration"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                  "requestString": {
+                    "type": "object",
+                    "properties": {
+                      "loanAmount": { "type": "string", "example": "1500000" },
+                      "tenure": { "type": "string", "example": "36" },
+                      "rateofInterest": { "type": "string", "example": "10.20%" },
+                      "emi": { "type": "string", "example": "48449" },
+                      "processingfees": { "type": "string", "example": "3000" },
+                      "product": { "type": "string", "example": "PL" },
+                      "consentToCALL": { "type": "string", "example": "Y" },
+                      "educationalQualification": { "type": "string", "example": "" },
+                      "monthlyTakeHomeSalary": { "type": "string", "example": "100000" },
+                      "noOfDependent": { "type": "string", "example": "2" },
+                      "salesPromotion": { "type": "string", "example": "" },
+                      "yearAtCity": { "type": "string", "example": "" },
+                      "yearAtCurrentAddress": { "type": "string", "example": "" },
+                      "employerName": { "type": "string", "example": "Apollo Services" },
+                      "vkycConsent": { "type": "string", "example": "Y" },
+                      "vkycRetUrl": { "type": "string", "example": "" },
+                      "leadRetUrl": { "type": "string", "example": "" },
+                      "flgDropOff": { "type": "string", "example": "" },
+                      "fillerFields": { "$ref": "#/components/schemas/FillerFields" }
+                    },
+                    "required": ["loanAmount", "tenure", "rateofInterest", "emi"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Loan application submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contextParam": { "$ref": "#/components/schemas/ContextParam" },
+                    "responseString": {
+                      "type": "object",
+                      "properties": {
+                        "vkycLink": { "type": "string", "example": "" },
+                        "acknowledgementId": { "type": "string", "example": "142356743" }
+                      }
+                    },
+                    "status": { "$ref": "#/components/schemas/ApiStatus" }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Submission successful",
+                    "value": {
+                      "contextParam": {
+                        "partnerID": "HDFCBANK",
+                        "channelID": "ADOBE",
+                        "productName": "PL",
+                        "partnerJourneyID": "123456",
+                        "bankJourneyID": "7890123"
+                      },
+                      "responseString": {
+                        "vkycLink": "",
+                        "acknowledgementId": "142356743"
+                      },
+                      "status": {
+                        "responseCode": "0",
+                        "errorCode": "",
+                        "errorDesc": ""
+                      }
+                    }
+                  },
+                  "failure": {
+                    "summary": "Submission failed",
+                    "value": {
+                      "responseString": {},
+                      "status": {
+                        "responseCode": "1",
+                        "errorCode": "ERR_SUB_001",
+                        "errorDesc": "Loan application submission failed. Please try again."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

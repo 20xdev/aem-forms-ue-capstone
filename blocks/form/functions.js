@@ -56,7 +56,165 @@ function maskMobileNumber(mobileNumber) {
   return ` ${'*'.repeat(5)}${value.substring(5)}`;
 }
 
+/**
+ * Initiates customer identification by sending mobile + PAN/DOB.
+ * Called on Welcome page submit. Sets offerAvailable flag in form.
+ * @name initiateCustomerIdentification
+ * @param {string} mobileNo
+ * @param {string} identifierName - PAN_NO or DOB
+ * @param {string} identifierValue - PAN number or date of birth value
+ * @param {scope} globals
+ */
+async function initiateCustomerIdentification(mobileNo, identifierName, identifierValue, globals) {
+  const { MOCK_API_BASE_URL, CONTEXT_PARAM } = await import('./constant.js');
+  const payload = {
+    contextParam: { ...CONTEXT_PARAM },
+    requestString: {
+      mobileNo,
+      identifierName,
+      identifierValue,
+      msgType: 'S',
+      fillerFields: {},
+    },
+  };
+  try {
+    const response = await fetch(`${MOCK_API_BASE_URL}/initiateCustomerIdentification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (data?.status?.responseCode === '0') {
+      globals.functions.setProperty('offerAvailable', { value: data.responseString.offerAvailable });
+      globals.functions.setProperty('existingCustomer', { value: data.responseString.existingCustomer });
+      globals.functions.setProperty('bankJourneyID', { value: data.contextParam.bankJourneyID });
+      return data;
+    }
+    globals.functions.setProperty('apiError', { value: data.status.errorDesc });
+    return null;
+  } catch (e) {
+    globals.functions.setProperty('apiError', { value: 'Unable to reach server. Please try again.' });
+    return null;
+  }
+}
+
+/**
+ * Verifies OTP and fetches customer demographic + offer details.
+ * Called on OTP page submit. Populates customer fields in the form.
+ * @name verifyOTPAndGetDemogDetails
+ * @param {string} otp - 6-digit OTP entered by user
+ * @param {scope} globals
+ */
+async function verifyOTPAndGetDemogDetails(otp, globals) {
+  const { MOCK_API_BASE_URL, CONTEXT_PARAM } = await import('./constant.js');
+  const bankJourneyID = globals.functions.getProperty('bankJourneyID')?.value || CONTEXT_PARAM.bankJourneyID;
+  const payload = {
+    contextParam: { ...CONTEXT_PARAM, bankJourneyID },
+    requestString: {
+      passwordValue: otp,
+      fillerFields: {},
+    },
+  };
+  try {
+    const response = await fetch(`${MOCK_API_BASE_URL}/verifyOTPAndGetDemogDetails`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (data?.status?.responseCode === '0') {
+      const customer = data.responseString.OfferDemogDetails?.[0];
+      if (customer) {
+        globals.functions.setProperty('customerFirstName', { value: customer.customerFirstName });
+        globals.functions.setProperty('customerLastName', { value: customer.customerLastName });
+        globals.functions.setProperty('customerCity', { value: customer.customerCity });
+        globals.functions.setProperty('customerState', { value: customer.customerState });
+        globals.functions.setProperty('emailAddress', { value: customer.emailAddress });
+        globals.functions.setProperty('offerAmount', { value: customer.offerAmount });
+        globals.functions.setProperty('offerType', { value: customer.offerType });
+        globals.functions.setProperty('tenure', { value: customer.tenure });
+        globals.functions.setProperty('rateOfInterest', { value: customer.rateOfInterest });
+        globals.functions.setProperty('customerID', { value: customer.customerID });
+        globals.functions.setProperty('accountNumber', { value: customer.accountNumber });
+      }
+      return data;
+    }
+    globals.functions.setProperty('otpError', { value: data.status.errorDesc });
+    return null;
+  } catch (e) {
+    globals.functions.setProperty('otpError', { value: 'OTP verification failed. Please try again.' });
+    return null;
+  }
+}
+
+/**
+ * Calculates EMI using standard formula: P × r × (1+r)^n / ((1+r)^n - 1)
+ * @name calculateEMI
+ * @param {number} principal - Loan amount in INR
+ * @param {number} annualRate - Annual interest rate (e.g. 10.20)
+ * @param {number} tenureMonths - Loan tenure in months
+ * @return {number} Monthly EMI rounded to nearest rupee
+ */
+function calculateEMI(principal, annualRate, tenureMonths) {
+  const r = annualRate / (12 * 100);
+  const n = tenureMonths;
+  if (r === 0) return Math.round(principal / n);
+  const emi = (principal * r * (1 + r) ** n) / ((1 + r) ** n - 1);
+  return Math.round(emi);
+}
+
+/**
+ * Submits the final loan application and returns the acknowledgement ID.
+ * Called from Preview/Review screen on Continue click.
+ * @name submitLoanApplication
+ * @param {scope} globals
+ */
+async function submitLoanApplication(globals) {
+  const { MOCK_API_BASE_URL, CONTEXT_PARAM } = await import('./constant.js');
+  const data = globals.functions.exportData();
+  const payload = {
+    contextParam: { ...CONTEXT_PARAM },
+    requestString: {
+      loanAmount: data.loanAmount || '',
+      tenure: data.tenure || '',
+      rateofInterest: data.rateOfInterest || '',
+      emi: data.emi || '',
+      processingfees: data.processingFees || '',
+      product: 'PL',
+      consentToCALL: data.consentToCALL || 'Y',
+      monthlyTakeHomeSalary: data.monthlyIncome || '',
+      employerName: data.employerName || '',
+      vkycConsent: 'Y',
+      fillerFields: {},
+    },
+  };
+  try {
+    const response = await fetch(`${MOCK_API_BASE_URL}/submitLoanApplication`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (result?.status?.responseCode === '0') {
+      globals.functions.setProperty('acknowledgementId', { value: result.responseString.acknowledgementId });
+      return result;
+    }
+    globals.functions.setProperty('apiError', { value: result.status.errorDesc });
+    return null;
+  } catch (e) {
+    globals.functions.setProperty('apiError', { value: 'Loan submission failed. Please try again.' });
+    return null;
+  }
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
-  getFullName, days, submitFormArrayToString, maskMobileNumber,
+  getFullName,
+  days,
+  submitFormArrayToString,
+  maskMobileNumber,
+  initiateCustomerIdentification,
+  verifyOTPAndGetDemogDetails,
+  calculateEMI,
+  submitLoanApplication,
 };
