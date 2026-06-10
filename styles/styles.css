@@ -288,7 +288,7 @@ main .form .field-editmobilebtn button:hover {
 /* .panel-wrapper.field-countrycodemobile = (0,2,0) — beats form.css .panel-wrapper (0,1,0) */
 .panel-wrapper.field-countrycodemobile {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   flex-wrap: nowrap;
   gap: 0;
 }
@@ -296,6 +296,10 @@ main .form .field-editmobilebtn button:hover {
 .field-countrycodemobile .field-countrycode {
   flex: 0 0 72px;
   margin-right: 0;
+
+  /* Push input down by label height so it aligns with mobile input.
+     label font-size (18px) × body line-height (1.6) = 28.8px */
+  padding-top: calc(var(--form-font-size-s) * 1.6);
 }
 
 /* (0,2,1) — beats form.css .field-wrapper input (0,1,1) */
