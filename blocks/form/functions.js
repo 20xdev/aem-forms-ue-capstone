@@ -68,7 +68,7 @@ function maskMobileNumber(mobileNumber) {
  * @param {string} identifierValue PAN number or date of birth
  * @param {scope} globals
  */
-async function initiateCustomerIdentification(mobileNo, identifierName, identifierValue, globals) {
+function initiateCustomerIdentification(mobileNo, identifierName, identifierValue, globals) {
   const payload = {
     contextParam: { ...CONTEXT_PARAM },
     requestString: {
@@ -79,36 +79,37 @@ async function initiateCustomerIdentification(mobileNo, identifierName, identifi
       fillerFields: {},
     },
   };
-  try {
-    const response = await fetch(`${MOCK_API_BASE_URL}/initiateCustomerIdentification`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+  return fetch(`${MOCK_API_BASE_URL}/initiateCustomerIdentification`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data?.status?.responseCode === '0') {
+        globals.functions.setProperty('offerAvailable', { value: data.responseString.offerAvailable });
+        globals.functions.setProperty('existingCustomer', { value: data.responseString.existingCustomer });
+        globals.functions.setProperty('bankJourneyID', { value: data.contextParam.bankJourneyID });
+        return data;
+      }
+      globals.functions.setProperty('apiError', { value: data.status.errorDesc });
+      return null;
+    })
+    .catch(() => {
+      globals.functions.setProperty('apiError', { value: 'Unable to reach server. Please try again.' });
+      return null;
     });
-    const data = await response.json();
-    if (data?.status?.responseCode === '0') {
-      globals.functions.setProperty('offerAvailable', { value: data.responseString.offerAvailable });
-      globals.functions.setProperty('existingCustomer', { value: data.responseString.existingCustomer });
-      globals.functions.setProperty('bankJourneyID', { value: data.contextParam.bankJourneyID });
-      return data;
-    }
-    globals.functions.setProperty('apiError', { value: data.status.errorDesc });
-    return null;
-  } catch (e) {
-    globals.functions.setProperty('apiError', { value: 'Unable to reach server. Please try again.' });
-    return null;
-  }
 }
 
 /**
- * Verifies OTP and loads customer demographic and offer details —
- * called when Offer step initializes
+ * Verifies OTP and loads customer demographic and offer details
  * @name verifyOTPAndGetDemogDetails Validates OTP and populates customer fields
  * @param {string} otp 6-digit OTP entered by user
  * @param {scope} globals
  */
-async function verifyOTPAndGetDemogDetails(otp, globals) {
-  const bankJourneyID = globals.functions.getProperty('bankJourneyID')?.value || CONTEXT_PARAM.bankJourneyID;
+function verifyOTPAndGetDemogDetails(otp, globals) {
+  const bankJourneyID = globals.functions.getProperty('bankJourneyID')?.value
+    || CONTEXT_PARAM.bankJourneyID;
   const payload = {
     contextParam: { ...CONTEXT_PARAM, bankJourneyID },
     requestString: {
@@ -116,36 +117,37 @@ async function verifyOTPAndGetDemogDetails(otp, globals) {
       fillerFields: {},
     },
   };
-  try {
-    const response = await fetch(`${MOCK_API_BASE_URL}/verifyOTPAndGetDemogDetails`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const data = await response.json();
-    if (data?.status?.responseCode === '0') {
-      const customer = data.responseString.OfferDemogDetails?.[0];
-      if (customer) {
-        globals.functions.setProperty('customerFirstName', { value: customer.customerFirstName });
-        globals.functions.setProperty('customerLastName', { value: customer.customerLastName });
-        globals.functions.setProperty('customerCity', { value: customer.customerCity });
-        globals.functions.setProperty('customerState', { value: customer.customerState });
-        globals.functions.setProperty('emailAddress', { value: customer.emailAddress });
-        globals.functions.setProperty('offerAmount', { value: customer.offerAmount });
-        globals.functions.setProperty('offerType', { value: customer.offerType });
-        globals.functions.setProperty('tenure', { value: customer.tenure });
-        globals.functions.setProperty('rateOfInterest', { value: customer.rateOfInterest });
-        globals.functions.setProperty('customerID', { value: customer.customerID });
-        globals.functions.setProperty('accountNumber', { value: customer.accountNumber });
+  return fetch(`${MOCK_API_BASE_URL}/verifyOTPAndGetDemogDetails`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data?.status?.responseCode === '0') {
+        const customer = data.responseString.OfferDemogDetails?.[0];
+        if (customer) {
+          globals.functions.setProperty('customerFirstName', { value: customer.customerFirstName });
+          globals.functions.setProperty('customerLastName', { value: customer.customerLastName });
+          globals.functions.setProperty('customerCity', { value: customer.customerCity });
+          globals.functions.setProperty('customerState', { value: customer.customerState });
+          globals.functions.setProperty('emailAddress', { value: customer.emailAddress });
+          globals.functions.setProperty('offerAmount', { value: customer.offerAmount });
+          globals.functions.setProperty('offerType', { value: customer.offerType });
+          globals.functions.setProperty('tenure', { value: customer.tenure });
+          globals.functions.setProperty('rateOfInterest', { value: customer.rateOfInterest });
+          globals.functions.setProperty('customerID', { value: customer.customerID });
+          globals.functions.setProperty('accountNumber', { value: customer.accountNumber });
+        }
+        return data;
       }
-      return data;
-    }
-    globals.functions.setProperty('otpError', { value: data.status.errorDesc });
-    return null;
-  } catch (e) {
-    globals.functions.setProperty('otpError', { value: 'OTP verification failed. Please try again.' });
-    return null;
-  }
+      globals.functions.setProperty('otpError', { value: data.status.errorDesc });
+      return null;
+    })
+    .catch(() => {
+      globals.functions.setProperty('otpError', { value: 'OTP verification failed. Please try again.' });
+      return null;
+    });
 }
 
 /**
@@ -169,7 +171,7 @@ function calculateEMI(principal, annualRate, tenureMonths) {
  * @name submitLoanApplication Submits loan application and stores acknowledgement ID
  * @param {scope} globals
  */
-async function submitLoanApplication(globals) {
+function submitLoanApplication(globals) {
   const data = globals.functions.exportData();
   const payload = {
     contextParam: { ...CONTEXT_PARAM },
@@ -187,23 +189,24 @@ async function submitLoanApplication(globals) {
       fillerFields: {},
     },
   };
-  try {
-    const response = await fetch(`${MOCK_API_BASE_URL}/submitLoanApplication`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+  return fetch(`${MOCK_API_BASE_URL}/submitLoanApplication`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result?.status?.responseCode === '0') {
+        globals.functions.setProperty('acknowledgementId', { value: result.responseString.acknowledgementId });
+        return result;
+      }
+      globals.functions.setProperty('apiError', { value: result.status.errorDesc });
+      return null;
+    })
+    .catch(() => {
+      globals.functions.setProperty('apiError', { value: 'Loan submission failed. Please try again.' });
+      return null;
     });
-    const result = await response.json();
-    if (result?.status?.responseCode === '0') {
-      globals.functions.setProperty('acknowledgementId', { value: result.responseString.acknowledgementId });
-      return result;
-    }
-    globals.functions.setProperty('apiError', { value: result.status.errorDesc });
-    return null;
-  } catch (e) {
-    globals.functions.setProperty('apiError', { value: 'Loan submission failed. Please try again.' });
-    return null;
-  }
 }
 
 // eslint-disable-next-line import/prefer-default-export
