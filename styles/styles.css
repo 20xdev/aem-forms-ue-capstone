@@ -261,75 +261,79 @@ main .section.highlight {
   padding: 40px 0;
 }
 
-/* Hide wizard step tab indicators */
-.wizard-menu-items {
-  display: none !important;
+/* Hide wizard step tab indicators
+   .panel-wrapper.wizard gives (0,2,0) — beats form.css .wizard-menu-items (0,1,0) */
+.panel-wrapper.wizard .wizard-menu-items {
+  display: none;
 }
 
-/* Edit Mobile Number — link style, not button */
+/* Edit Mobile Number — link style, not button
+   main .form .field-editmobilebtn button = (0,3,1) — beats global button (0,0,1) */
 main .form .field-editmobilebtn button,
 main .form .field-editmobilebtn button:hover {
-  background: none !important;
-  border: none !important;
-  color: #004c8f !important;
+  background: none;
+  border: none;
+  color: #004c8f;
   cursor: pointer;
   padding: 0;
   text-decoration: underline;
   font-size: inherit;
-  width: auto !important;
+  width: auto;
 }
 
 /* ============================================
    WELCOME PANEL — COUNTRY CODE + MOBILE
    ============================================ */
 
-/* Country code + mobile: connected pill, inputs bottom-aligned */
-.field-countrycodemobile {
-  display: flex !important;
+/* .panel-wrapper.field-countrycodemobile = (0,2,0) — beats form.css .panel-wrapper (0,1,0) */
+.panel-wrapper.field-countrycodemobile {
+  display: flex;
   align-items: flex-end;
   flex-wrap: nowrap;
-  gap: 0 !important;
+  gap: 0;
 }
 
-/* Fixed narrow width — prevents expanding to full-row width */
-.field-countrycode {
+.field-countrycodemobile .field-countrycode {
   flex: 0 0 72px;
+  margin-right: 0;
 }
 
-.field-countrycode input {
+/* (0,2,1) — beats form.css .field-wrapper input (0,1,1) */
+.field-countrycodemobile .field-countrycode input {
   width: 72px;
-  border-radius: 0.25rem 0 0 0.25rem !important;
-  border-right: none !important;
+  border-radius: 0.25rem 0 0 0.25rem;
+  border-right: none;
   text-align: center;
   color: #131313;
 }
 
-.field-mobileno {
+.field-countrycodemobile .field-mobileno {
   flex: 1 1 auto;
   min-width: 0;
+  max-width: 315px;
+  margin-left: 0;
 }
 
-.field-mobileno input {
-  border-radius: 0 0.25rem 0.25rem 0 !important;
+.field-countrycodemobile .field-mobileno input {
+  border-radius: 0 0.25rem 0.25rem 0;
 }
 
 /* ============================================
    OTP PANEL — MASKED MOBILE ROW
    ============================================ */
 
-/* Override grid with flex so text + value + button sit inline */
-.field-maskedmobilenumberwrapper {
-  display: flex !important;
+/* .panel-wrapper.field-maskedmobilenumberwrapper = (0,2,0) */
+.panel-wrapper.field-maskedmobilenumberwrapper {
+  display: flex;
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  grid-column: span 12;
 }
 
+/* flex: none prevents items from growing — grid-column omitted (no effect on flex items) */
 .field-maskedmobilenumberwrapper > .field-otptitletext,
 .field-maskedmobilenumberwrapper > .field-maskedmobile,
 .field-maskedmobilenumberwrapper > .field-editmobilebtn {
-  grid-column: unset !important;
   flex: none;
 }
 
@@ -338,8 +342,9 @@ main .form .field-editmobilebtn button:hover {
   display: none;
 }
 
-.field-maskedmobile input {
-  border: none !important;
+/* (0,2,1) */
+.field-maskedmobilenumberwrapper .field-maskedmobile input {
+  border: none;
   background: transparent;
   padding: 0;
   margin: 0;
@@ -371,29 +376,27 @@ main .form .field-editmobilebtn button:hover {
    OFFER DISPLAY — BANNER
    ============================================ */
 
-.field-loan-offer-banner {
+/* .panel-wrapper.field-loan-offer-banner = (0,2,0) */
+.panel-wrapper.field-loan-offer-banner {
   background: #ebf3ff;
   border-radius: 8px;
   padding: 14px 16px;
-  display: flex !important;
+  display: flex;
   flex-direction: row;
   align-items: center;
   gap: 12px;
   grid-column: span 12;
 }
 
-.field-loan-offer-banner > * {
-  grid-column: unset !important;
-}
-
 /* Banner icon — styled as plain emoji text, not an input */
-.field-offer-banner-icon label,
-.field-offer-banner-icon .field-description {
+.field-loan-offer-banner .field-offer-banner-icon label,
+.field-loan-offer-banner .field-offer-banner-icon .field-description {
   display: none;
 }
 
-.field-offer-banner-icon input {
-  border: none !important;
+/* (0,2,1) */
+.field-loan-offer-banner .field-offer-banner-icon input {
+  border: none;
   background: transparent;
   padding: 0;
   margin: 0;
@@ -408,20 +411,21 @@ main .form .field-editmobilebtn button:hover {
    ============================================ */
 
 /* Hide redundant slider labels (already shown as bold text above) */
-.field-loan-amount-slider-value > label,
-.field-loan-tenure-slider-value > label {
+.field-loan-amount-control .field-loan-amount-slider-value > label,
+.field-loan-tenure-control .field-loan-tenure-slider-value > label {
   display: none;
 }
 
 /* Display amount/tenure — hide label, render value as plain text */
-.field-loan-amount-display label,
-.field-loan-tenure-display label {
+.field-loan-controls-left .field-loan-amount-display label,
+.field-loan-controls-left .field-loan-tenure-display label {
   display: none;
 }
 
-.field-loan-amount-display input,
-.field-loan-tenure-display input {
-  border: none !important;
+/* (0,2,1) */
+.field-loan-controls-left .field-loan-amount-display input,
+.field-loan-controls-left .field-loan-tenure-display input {
+  border: none;
   background: transparent;
   padding: 0;
   margin: 0;
@@ -446,12 +450,13 @@ main .form .field-editmobilebtn button:hover {
 }
 
 /* Summary amount — large prominent number */
-.field-summary-amount label {
+.field-loan-summary-right .field-summary-amount label {
   display: none;
 }
 
-.field-summary-amount input {
-  border: none !important;
+/* (0,2,1) */
+.field-loan-summary-right .field-summary-amount input {
+  border: none;
   background: transparent;
   padding: 0;
   margin: 4px 0 8px;
@@ -471,18 +476,19 @@ main .form .field-editmobilebtn button:hover {
 }
 
 /* EMI / ROI / Taxes — small label, bold value */
-.field-emi-amount label,
-.field-rate-of-interest label,
-.field-taxes label {
+.field-summary-metrics-grid .field-emi-amount label,
+.field-summary-metrics-grid .field-rate-of-interest label,
+.field-summary-metrics-grid .field-taxes label {
   font-size: 0.75rem;
   color: #666;
   font-weight: 400;
 }
 
-.field-emi-amount input,
-.field-rate-of-interest input,
-.field-taxes input {
-  border: none !important;
+/* (0,2,1) */
+.field-summary-metrics-grid .field-emi-amount input,
+.field-summary-metrics-grid .field-rate-of-interest input,
+.field-summary-metrics-grid .field-taxes input {
+  border: none;
   background: transparent;
   padding: 0;
   margin: 2px 0 8px;
@@ -493,28 +499,27 @@ main .form .field-editmobilebtn button:hover {
 }
 
 /* Disclaimer footer */
-.field-summary-disclaimer-footer {
+
+/* .panel-wrapper.field-summary-disclaimer-footer = (0,2,0) */
+.panel-wrapper.field-summary-disclaimer-footer {
   background: #fffbf0;
   border: 1px solid #ffe082;
   border-radius: 4px;
   padding: 8px 12px;
   margin-top: 12px;
-  display: flex !important;
+  display: flex;
   align-items: flex-start;
   gap: 6px;
 }
 
-.field-summary-disclaimer-footer > * {
-  grid-column: unset !important;
-}
-
-.field-disclaimer-icon label,
-.field-disclaimer-icon .field-description {
+.field-summary-disclaimer-footer .field-disclaimer-icon label,
+.field-summary-disclaimer-footer .field-disclaimer-icon .field-description {
   display: none;
 }
 
-.field-disclaimer-icon input {
-  border: none !important;
+/* (0,2,1) */
+.field-summary-disclaimer-footer .field-disclaimer-icon input {
+  border: none;
   background: transparent;
   padding: 0;
   margin: 0;
