@@ -710,6 +710,33 @@
               }
             }
           }
+        },
+        {
+          "title": "Loan Wizard",
+          "id": "loan-wizard",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Loan Wizard",
+                  "fieldType": "panel",
+                  "fd:viewType": "loan-wizard",
+                  "minOccur": 1,
+                  "panel1": {
+                    "jcr:title": "Step 1",
+                    "fieldType": "panel",
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  },
+                  "panel2": {
+                    "jcr:title": "Step 2",
+                    "fieldType": "panel",
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  }
+                }
+              }
+            }
+          }
         }
       ]
     }

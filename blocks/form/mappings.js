@@ -1,6 +1,6 @@
 import { loadCSS } from '../../scripts/aem.js';
 
-let customComponents = ['card-choice', 'range'];
+let customComponents = ['card-choice', 'range', 'loan-wizard'];
 const OOTBComponentDecorators = ['accordion', 'file', 'modal', 'password', 'rating', 'repeat', 'tnc', 'toggleable-link', 'wizard'];
 
 export function setCustomComponents(components) {
@@ -67,7 +67,7 @@ export default async function componentDecorator(element, fd, container, formId)
     await loadComponent('file', element, fd, container, formId);
   }
 
-  if (type.endsWith('wizard')) {
+  if (type.endsWith('wizard') && !getCustomComponents().includes(type)) {
     await loadComponent('wizard', element, fd, container, formId);
   }
 

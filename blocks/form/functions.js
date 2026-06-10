@@ -75,6 +75,7 @@ function maskMobileNumber(mobileNumber) {
 function initiateCustomerIdentification(globals) {
   const formData = globals.functions.exportData();
   const mobileNo = formData.mobileNo || '';
+  if (!mobileNo) return '';
   const panNo = formData.panNo || '';
   const rawDob = formData.dateOfBirth || formData.dob || '';
   const dobFormatted = rawDob ? String(rawDob).replace(/-/g, '') : '';
@@ -118,6 +119,7 @@ function initiateCustomerIdentification(globals) {
  * @param {scope} globals
  */
 function verifyOTPAndGetDemogDetails(otp, globals) {
+  if (!otp || String(otp).length !== 6) return '';
   const bankJourneyID = globals.functions.getProperty('bankJourneyID')?.value
     || CONTEXT_PARAM.bankJourneyID;
   const payload = {

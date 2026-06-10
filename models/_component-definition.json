@@ -45,6 +45,9 @@
         },
         {
           "...": "../blocks/form/components/card-choice/_card-choice.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/loan-wizard/_loan-wizard.json#/definitions"
         }
       ]
     }
