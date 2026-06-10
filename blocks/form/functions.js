@@ -1,3 +1,5 @@
+import { MOCK_API_BASE_URL, CONTEXT_PARAM } from './constant.js';
+
 /**
  * Get Full Name
  * @name getFullName Concats first name and last name
@@ -11,6 +13,7 @@ function getFullName(firstname, lastname) {
 
 /**
  * Custom submit function
+ * @name submitFormArrayToString Submits form data with arrays converted to comma-separated strings
  * @param {scope} globals
  */
 function submitFormArrayToString(globals) {
@@ -25,6 +28,7 @@ function submitFormArrayToString(globals) {
 
 /**
  * Calculate the number of days between two dates.
+ * @name days Calculates number of days between two dates
  * @param {*} endDate
  * @param {*} startDate
  * @returns {number} returns the number of days between two dates
@@ -43,30 +47,28 @@ function days(endDate, startDate) {
 }
 
 /**
-* Masks the first 5 digits of the mobile number with *
-* @param {*} mobileNumber
-* @returns {string} returns the mobile number with first 5 digits masked
-*/
+ * Masks the first 5 digits of the mobile number with *
+ * @name maskMobileNumber Masks first 5 digits of mobile number
+ * @param {string} mobileNumber
+ * @returns {string} returns the mobile number with first 5 digits masked
+ */
 function maskMobileNumber(mobileNumber) {
   if (!mobileNumber) {
     return '';
   }
   const value = mobileNumber.toString();
-  // Mask first 5 digits and keep the rest
   return ` ${'*'.repeat(5)}${value.substring(5)}`;
 }
 
 /**
- * Initiates customer identification by sending mobile + PAN/DOB.
- * Called on Welcome page submit. Sets offerAvailable flag in form.
- * @name initiateCustomerIdentification
- * @param {string} mobileNo
- * @param {string} identifierName - PAN_NO or DOB
- * @param {string} identifierValue - PAN number or date of birth value
+ * Initiates customer identification — called when OTP step initializes
+ * @name initiateCustomerIdentification Sends mobile and PAN/DOB to identify customer
+ * @param {string} mobileNo Mobile number entered on welcome page
+ * @param {string} identifierName PAN_NO or DOB
+ * @param {string} identifierValue PAN number or date of birth
  * @param {scope} globals
  */
 async function initiateCustomerIdentification(mobileNo, identifierName, identifierValue, globals) {
-  const { MOCK_API_BASE_URL, CONTEXT_PARAM } = await import('./constant.js');
   const payload = {
     contextParam: { ...CONTEXT_PARAM },
     requestString: {
@@ -99,14 +101,13 @@ async function initiateCustomerIdentification(mobileNo, identifierName, identifi
 }
 
 /**
- * Verifies OTP and fetches customer demographic + offer details.
- * Called on OTP page submit. Populates customer fields in the form.
- * @name verifyOTPAndGetDemogDetails
- * @param {string} otp - 6-digit OTP entered by user
+ * Verifies OTP and loads customer demographic and offer details —
+ * called when Offer step initializes
+ * @name verifyOTPAndGetDemogDetails Validates OTP and populates customer fields
+ * @param {string} otp 6-digit OTP entered by user
  * @param {scope} globals
  */
 async function verifyOTPAndGetDemogDetails(otp, globals) {
-  const { MOCK_API_BASE_URL, CONTEXT_PARAM } = await import('./constant.js');
   const bankJourneyID = globals.functions.getProperty('bankJourneyID')?.value || CONTEXT_PARAM.bankJourneyID;
   const payload = {
     contextParam: { ...CONTEXT_PARAM, bankJourneyID },
@@ -148,11 +149,11 @@ async function verifyOTPAndGetDemogDetails(otp, globals) {
 }
 
 /**
- * Calculates EMI using standard formula: P × r × (1+r)^n / ((1+r)^n - 1)
- * @name calculateEMI
- * @param {number} principal - Loan amount in INR
- * @param {number} annualRate - Annual interest rate (e.g. 10.20)
- * @param {number} tenureMonths - Loan tenure in months
+ * Calculates monthly EMI using standard formula
+ * @name calculateEMI Calculates EMI: P x r x (1+r)^n / ((1+r)^n - 1)
+ * @param {number} principal Loan amount in INR
+ * @param {number} annualRate Annual interest rate e.g. 10.20
+ * @param {number} tenureMonths Loan tenure in months
  * @return {number} Monthly EMI rounded to nearest rupee
  */
 function calculateEMI(principal, annualRate, tenureMonths) {
@@ -164,13 +165,11 @@ function calculateEMI(principal, annualRate, tenureMonths) {
 }
 
 /**
- * Submits the final loan application and returns the acknowledgement ID.
- * Called from Preview/Review screen on Continue click.
- * @name submitLoanApplication
+ * Submits the final loan application — called when Thank You step initializes
+ * @name submitLoanApplication Submits loan application and stores acknowledgement ID
  * @param {scope} globals
  */
 async function submitLoanApplication(globals) {
-  const { MOCK_API_BASE_URL, CONTEXT_PARAM } = await import('./constant.js');
   const data = globals.functions.exportData();
   const payload = {
     contextParam: { ...CONTEXT_PARAM },
