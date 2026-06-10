@@ -72,12 +72,13 @@ function maskMobileNumber(mobileNumber) {
  * @name initiateCustomerIdentification Sends mobile and PAN/DOB to identify customer
  * @param {string} mobileNo Mobile number entered on welcome page
  * @param {string} panNo PAN number (leave empty if using DOB)
- * @param {string} dob Date of birth YYYYMMDD format (leave empty if using PAN)
+ * @param dob Date of birth from date picker (leave empty if using PAN)
  * @param {scope} globals
  */
 function initiateCustomerIdentification(mobileNo, panNo, dob, globals) {
   const identifierName = panNo ? 'PAN_NO' : 'DOB';
-  const identifierValue = panNo || dob;
+  const dobFormatted = dob ? String(dob).replace(/-/g, '') : '';
+  const identifierValue = panNo || dobFormatted;
   const payload = {
     contextParam: { ...CONTEXT_PARAM },
     requestString: {
