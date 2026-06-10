@@ -70,12 +70,12 @@ function maskMobileNumber(mobileNumber) {
 /**
  * Initiates customer identification — called when OTP step initializes
  * @name initiateCustomerIdentification Sends mobile and PAN/DOB to identify customer
- * @param {string} mobileNo Mobile number entered on welcome page
- * @param {string} panNo PAN number (empty string if user chose DOB)
  * @param {scope} globals
  */
-function initiateCustomerIdentification(mobileNo, panNo, globals) {
+function initiateCustomerIdentification(globals) {
   const formData = globals.functions.exportData();
+  const mobileNo = formData.mobileNo || '';
+  const panNo = formData.panNo || '';
   const rawDob = formData.dateOfBirth || formData.dob || '';
   const dobFormatted = rawDob ? String(rawDob).replace(/-/g, '') : '';
   const identifierName = panNo ? 'PAN_NO' : 'DOB';
