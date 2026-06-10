@@ -71,8 +71,8 @@ function maskMobileNumber(mobileNumber) {
  * Initiates customer identification — called when OTP step initializes
  * @name initiateCustomerIdentification Sends mobile and PAN/DOB to identify customer
  * @param {string} mobileNo Mobile number entered on welcome page
- * @param {string} panNo PAN number (leave empty if using DOB)
- * @param dob Date of birth from date picker (leave empty if using PAN)
+ * @param {string} panNo PAN number field — always bind, empty at runtime if user chose DOB
+ * @param {string} dob Date of birth field — always bind, empty at runtime if user chose PAN
  * @param {scope} globals
  */
 function initiateCustomerIdentification(mobileNo, panNo, dob, globals) {
