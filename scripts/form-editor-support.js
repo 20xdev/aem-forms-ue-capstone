@@ -55,14 +55,12 @@ export function getFieldById(panel, id, formFieldMap) {
 }
 
 export function handleWizardNavigation(wizardEl, navigateTo) {
-  const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
-  existingSelectedEl.classList.remove('current-wizard-step');
+  wizardEl.querySelector('.current-wizard-step')?.classList.remove('current-wizard-step');
   navigateTo.classList.add('current-wizard-step');
   activeWizardStep = navigateTo.dataset.id;
   const navigateToMenuItem = wizardEl.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
-  const currentMenuItem = wizardEl.querySelector('.wizard-menu-active-item');
-  currentMenuItem.classList.remove('wizard-menu-active-item');
-  navigateToMenuItem.classList.add('wizard-menu-active-item');
+  wizardEl.querySelector('.wizard-menu-active-item')?.classList.remove('wizard-menu-active-item');
+  navigateToMenuItem?.classList.add('wizard-menu-active-item');
 }
 
 function handleAccordionNavigationInEditor(accordionEl, navigateTo) {

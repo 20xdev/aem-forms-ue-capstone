@@ -26,7 +26,7 @@ class LoanWizardLayout extends WizardLayout {
       panel.querySelector('.wizard-button-wrapper')?.remove();
     }
     if (!showStepMenu) {
-      panel.querySelector('.wizard-menu-items')?.remove();
+      panel.classList.add('no-step-menu');
     }
     this.wireNavButtons(panel);
   }
@@ -51,7 +51,9 @@ class LoanWizardLayout extends WizardLayout {
       if (nextBtn) {
         // Capture phase: runs before the Rule Editor's bubble-phase click listener.
         // Validation failure stops propagation so the bound custom function never executes.
+        // Skipped in UE edit mode so authoring clicks are not intercepted.
         nextBtn.addEventListener('click', (event) => {
+          if (document.documentElement.classList.contains('adobe-ue-edit')) return;
           const currentStep = panel.querySelector('.current-wizard-step');
           if (!this.validateContainer(currentStep)) {
             event.stopImmediatePropagation();

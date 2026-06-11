@@ -1,1 +1,5 @@
 /* Loan wizard uses wizard.js styles — no additional styles needed */
+
+.wizard.no-step-menu .wizard-menu-items {
+  display: none;
+}
