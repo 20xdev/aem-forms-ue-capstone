@@ -26,7 +26,7 @@ module.exports = {
       'card-choice': 20,
       form: 17,
       wizard: 12,
-      'loan-wizard': 13,
+      'loan-wizard': 14,
       'form-button': 7,
       'checkbox-group': 20,
       checkbox: 19,
@@ -49,7 +49,7 @@ module.exports = {
       rating: 18,
       password: 20,
       tnc: 12,
-      range: 19
+      range: 19,
     }],
     'xwalk/no-orphan-collapsible-fields': 'off', // Disable until enhancement is done for Forms properties
   },

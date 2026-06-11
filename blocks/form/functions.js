@@ -102,12 +102,16 @@ function initiateCustomerIdentification(globals) {
         globals.functions.setProperty('offerAvailable', { value: data.responseString.offerAvailable });
         globals.functions.setProperty('existingCustomer', { value: data.responseString.existingCustomer });
         globals.functions.setProperty('bankJourneyID', { value: data.contextParam.bankJourneyID });
+        document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
         globals.functions.setProperty('apiError', { value: data.status.errorDesc });
+        document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: data.status.errorDesc } }));
       }
     })
     .catch(() => {
-      globals.functions.setProperty('apiError', { value: 'Unable to reach server. Please try again.' });
+      const msg = 'Unable to reach server. Please try again.';
+      globals.functions.setProperty('apiError', { value: msg });
+      document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: msg } }));
     });
   return '';
 }
@@ -151,12 +155,16 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
           globals.functions.setProperty('customerID', { value: customer.customerID });
           globals.functions.setProperty('accountNumber', { value: customer.accountNumber });
         }
+        document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
         globals.functions.setProperty('otpError', { value: data.status.errorDesc });
+        document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: data.status.errorDesc } }));
       }
     })
     .catch(() => {
-      globals.functions.setProperty('otpError', { value: 'OTP verification failed. Please try again.' });
+      const msg = 'OTP verification failed. Please try again.';
+      globals.functions.setProperty('otpError', { value: msg });
+      document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: msg } }));
     });
   return '';
 }
@@ -209,13 +217,27 @@ function submitLoanApplication(globals) {
     .then((result) => {
       if (result?.status?.responseCode === '0') {
         globals.functions.setProperty('acknowledgementId', { value: result.responseString.acknowledgementId });
+        document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
         globals.functions.setProperty('apiError', { value: result.status.errorDesc });
+        document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: result.status.errorDesc } }));
       }
     })
     .catch(() => {
-      globals.functions.setProperty('apiError', { value: 'Loan submission failed. Please try again.' });
+      const msg = 'Loan submission failed. Please try again.';
+      globals.functions.setProperty('apiError', { value: msg });
+      document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: msg } }));
     });
+  return '';
+}
+
+/**
+ * Advances the loan wizard to the next step without an API call.
+ * Bind this on Click in Rule Editor for steps that require no server validation.
+ * @name proceedToNextStep Navigates to the next wizard step
+ */
+function proceedToNextStep() {
+  document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
   return '';
 }
 
@@ -229,4 +251,5 @@ export {
   verifyOTPAndGetDemogDetails,
   calculateEMI,
   submitLoanApplication,
+  proceedToNextStep,
 };

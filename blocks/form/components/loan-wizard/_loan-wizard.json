@@ -48,6 +48,13 @@
           "value": false
         },
         {
+          "component": "boolean",
+          "name": "showStepMenu",
+          "label": "Show Step Indicators (1, 2, 3…)",
+          "valueType": "boolean",
+          "value": true
+        },
+        {
           "...": "../../models/form-common/_help-container.json#/fields"
         }
       ]

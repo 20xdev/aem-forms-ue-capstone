@@ -4392,6 +4392,13 @@
         "value": false
       },
       {
+        "component": "boolean",
+        "name": "showStepMenu",
+        "label": "Show Step Indicators (1, 2, 3…)",
+        "valueType": "boolean",
+        "value": true
+      },
+      {
         "component": "tab",
         "label": "Help Content",
         "name": "help"
