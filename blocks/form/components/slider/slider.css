@@ -7,8 +7,10 @@
   column-gap: 16px;
 }
 
-/* Field label — left of header row */
-.field-slider .field-label {
+/* Field label — left of header row.
+   Uses tag selector (specificity 0,2,1) to override project-level label-hide rules. */
+.field-slider label.field-label {
+  display: block;
   grid-column: 1;
   font-weight: 700;
   font-size: 1.125rem;

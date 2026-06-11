@@ -19,6 +19,18 @@ function abbreviateLabel(value, format) {
   return `${Math.round(num)}`;
 }
 
+// The base range.js sets --current-steps/--total-steps using step counts, which diverges
+// from the actual thumb position when the value isn't on an exact step boundary.
+// This overrides those vars with the true value ratio so fill always tracks the thumb.
+function updateFill(input, wrapper) {
+  const min = parseFloat(input.min) || 0;
+  const max = parseFloat(input.max) || 100;
+  const value = parseFloat(input.value) || min;
+  const ratio = max > min ? (value - min) / (max - min) : 0;
+  wrapper.style.setProperty('--total-steps', '1000');
+  wrapper.style.setProperty('--current-steps', String(Math.round(ratio * 1000)));
+}
+
 function buildTicks(input, format, count) {
   const min = parseFloat(input.min) || 0;
   const max = parseFloat(input.max) || 100;
@@ -87,10 +99,14 @@ export default async function decorate(fieldDiv, fd) {
   let ticksEl = buildTicks(input, format, count);
   wrapper.appendChild(ticksEl);
 
-  // Rebuild ticks when max is updated dynamically (e.g. from API response)
+  // Correct initial fill (base range.js may have set step-based vars already)
+  updateFill(input, wrapper);
+
   let lastMax = input.max;
   input.addEventListener('input', () => {
     valueBox.textContent = `${prefix}${formatNum(input.value, format)}${suffix}`;
+    // Override step-based CSS vars with true value ratio so fill tracks the thumb
+    updateFill(input, wrapper);
     if (input.max !== lastMax) {
       lastMax = input.max;
       ticksEl.remove();
