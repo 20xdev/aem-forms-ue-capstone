@@ -1,0 +1,82 @@
+/* Slider: enhanced range with header row (label + value box) and tick labels */
+
+.field-slider {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 16px;
+}
+
+/* Field label — left of header row */
+.field-slider .field-label {
+  grid-column: 1;
+  font-weight: 700;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Formatted value box — right of header row */
+.field-slider .slider-value {
+  grid-column: 2;
+  padding: 10px 20px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Slider track wrapper — spans full width below header row */
+.field-slider .range-widget-wrapper {
+  grid-column: 1 / -1;
+  padding-bottom: 28px; /* room for tick labels */
+  position: relative;
+  margin-top: 20px;
+}
+
+.field-slider .range-widget-wrapper input[type="range"] {
+  width: 100%;
+  margin: 0;
+}
+
+/* Solid filled thumb — override base range's white+border style */
+.field-slider .range-widget-wrapper.decorated input[type="range"]::-webkit-slider-thumb {
+  background: var(--color-slider-thumb, #1c4d8e);
+  border: none;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(28, 77, 142, 0.15);
+}
+
+.field-slider .range-widget-wrapper.decorated input[type="range"]:focus::-webkit-slider-thumb {
+  background: var(--color-slider-thumb, #1c4d8e);
+  border-color: var(--color-slider-thumb, #1c4d8e);
+}
+
+/* Any other field-wrapper children (error message, description) span full width */
+.field-slider > *:not(.field-label):not(.slider-value):not(.range-widget-wrapper) {
+  grid-column: 1 / -1;
+}
+
+/* Suppress any base range elements that might survive in edge cases */
+.field-slider .range-bubble,
+.field-slider .range-min,
+.field-slider .range-max {
+  display: none;
+}
+
+/* Tick labels container */
+.slider-ticks {
+  position: relative;
+  height: 20px;
+  margin-top: 8px;
+}
+
+.slider-tick-label {
+  position: absolute;
+  font-size: 0.75rem;
+  color: #6b7280;
+  white-space: nowrap;
+  line-height: 1;
+}

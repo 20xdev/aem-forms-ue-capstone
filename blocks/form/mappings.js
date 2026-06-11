@@ -1,6 +1,6 @@
 import { loadCSS } from '../../scripts/aem.js';
 
-let customComponents = ['card-choice', 'range', 'loan-wizard'];
+let customComponents = ['card-choice', 'range', 'slider', 'loan-wizard'];
 const OOTBComponentDecorators = ['accordion', 'file', 'modal', 'password', 'rating', 'repeat', 'tnc', 'toggleable-link', 'wizard'];
 
 export function setCustomComponents(components) {

@@ -48,6 +48,9 @@
         },
         {
           "...": "../blocks/form/components/loan-wizard/_loan-wizard.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/slider/_slider.json#/definitions"
         }
       ]
     }

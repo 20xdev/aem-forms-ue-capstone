@@ -68,6 +68,22 @@ function maskMobileNumber(mobileNumber) {
 }
 
 /**
+ * Calculates monthly EMI using standard formula
+ * @name calculateEMI Calculates EMI: P x r x (1+r)^n / ((1+r)^n - 1)
+ * @param {number} principal Loan amount in INR
+ * @param {number} annualRate Annual interest rate e.g. 10.20
+ * @param {number} tenureMonths Loan tenure in months
+ * @return {number} Monthly EMI rounded to nearest rupee
+ */
+function calculateEMI(principal, annualRate, tenureMonths) {
+  const r = annualRate / (12 * 100);
+  const n = tenureMonths;
+  if (r === 0) return Math.round(principal / n);
+  const emi = (principal * r * (1 + r) ** n) / ((1 + r) ** n - 1);
+  return Math.round(emi);
+}
+
+/**
  * Initiates customer identification — called when OTP step initializes
  * @name initiateCustomerIdentification Sends mobile and PAN/DOB to identify customer
  * @param {scope} globals
@@ -146,19 +162,38 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
       if (data?.status?.responseCode === '0') {
         const customer = data.responseString.OfferDemogDetails?.[0];
         if (customer) {
+          // parseFloat strips trailing "%" from "10.20%" → 10.20
+          const offerAmountNum = parseFloat(customer.offerAmount) || 0;
+          const tenureNum = parseInt(customer.tenure, 10) || 36;
+          const rateNum = parseFloat(customer.rateOfInterest) || 0;
           globals.functions.importData({
             customerFirstName: customer.customerFirstName,
             customerLastName: customer.customerLastName,
             customerCity: customer.customerCity,
             customerState: customer.customerState,
             emailAddress: customer.emailAddress,
-            offerAmount: customer.offerAmount,
+            offerAmount: offerAmountNum,
             offerType: customer.offerType,
-            tenure: customer.tenure,
-            rateOfInterest: customer.rateOfInterest,
+            tenure: tenureNum,
+            rateOfInterest: rateNum,
             customerID: customer.customerID,
             accountNumber: customer.accountNumber,
+            // Initialise offer panel sliders and EMI
+            loan_amount_slider_value: offerAmountNum,
+            loan_tenure_slider_value: tenureNum,
+            emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
+            offer_banner_text: `You can get a loan up to ₹${offerAmountNum.toLocaleString('en-IN')}!`,
           });
+          // input.max and input.value are HTML attributes; importData cannot update them.
+          // Dispatch 'input' so the slider component re-renders its value box and ticks.
+          const loanSlider = document.querySelector('[name="loan_amount_slider_value"]');
+          if (loanSlider) {
+            loanSlider.value = offerAmountNum;
+            loanSlider.max = offerAmountNum;
+            loanSlider.dispatchEvent(new Event('input'));
+          }
+          const tenureSlider = document.querySelector('[name="loan_tenure_slider_value"]');
+          if (tenureSlider) tenureSlider.dispatchEvent(new Event('input'));
         }
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
@@ -172,22 +207,6 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
       document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: msg } }));
     });
   return '';
-}
-
-/**
- * Calculates monthly EMI using standard formula
- * @name calculateEMI Calculates EMI: P x r x (1+r)^n / ((1+r)^n - 1)
- * @param {number} principal Loan amount in INR
- * @param {number} annualRate Annual interest rate e.g. 10.20
- * @param {number} tenureMonths Loan tenure in months
- * @return {number} Monthly EMI rounded to nearest rupee
- */
-function calculateEMI(principal, annualRate, tenureMonths) {
-  const r = annualRate / (12 * 100);
-  const n = tenureMonths;
-  if (r === 0) return Math.round(principal / n);
-  const emi = (principal * r * (1 + r) ** n) / ((1 + r) ** n - 1);
-  return Math.round(emi);
 }
 
 /**
@@ -268,6 +287,23 @@ function goToStep(stepIndex) {
   return '';
 }
 
+/**
+ * Recalculates EMI from current slider values and stores the result.
+ * Bind on the Value Commit event of both the loan amount and tenure sliders.
+ * @name recalculateEMI Recalculates and stores EMI from current slider values
+ * @param {scope} globals
+ * @return {number} Updated EMI amount
+ */
+function recalculateEMI(globals) {
+  const data = globals.functions.exportData();
+  const principal = parseFloat(data.loan_amount_slider_value) || 0;
+  const rate = parseFloat(data.rateOfInterest) || 0;
+  const tenure = parseInt(data.loan_tenure_slider_value, 10) || 1;
+  const emi = calculateEMI(principal, rate, tenure);
+  globals.functions.importData({ emi_amount: emi });
+  return emi;
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,
@@ -281,4 +317,5 @@ export {
   proceedToNextStep,
   goToPrevStep,
   goToStep,
+  recalculateEMI,
 };

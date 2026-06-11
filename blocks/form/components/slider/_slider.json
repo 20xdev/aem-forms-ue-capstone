@@ -1,0 +1,92 @@
+{
+    "definitions": [
+      {
+        "title": "Slider",
+        "id": "slider",
+        "plugins": {
+          "xwalk": {
+            "page": {
+              "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+              "template": {
+                "jcr:title": "Slider",
+                "fieldType": "number-input",
+                "fd:viewType": "slider",
+                "enabled": true,
+                "visible": true
+              }
+            }
+          }
+        }
+      }
+    ],
+    "models": [
+      {
+        "id": "slider",
+        "fields": [
+          {
+            "component": "tab",
+            "label": "Basic",
+            "name": "basic"
+          },
+          {
+            "...": "../../models/form-common/_basic-input-fields.json#/fields"
+          },
+          {
+            "component": "tab",
+            "label": "Validation",
+            "name": "validation"
+          },
+          {
+            "...": "../../models/form-common/_number-validation-fields.json#/fields"
+          },
+          {
+            "component": "tab",
+            "label": "Custom Properties",
+            "name": "custom"
+          },
+          {
+            "component": "number",
+            "name": "stepValue",
+            "label": "Step Value",
+            "valueType": "number",
+            "description": "Step value for the slider"
+          },
+          {
+            "component": "select",
+            "name": "format",
+            "label": "Number Format",
+            "valueType": "string",
+            "description": "Controls how the value and tick labels are formatted.",
+            "options": [
+              { "name": "Number", "value": "number" },
+              { "name": "Indian Currency (K / L / Cr)", "value": "inr" }
+            ]
+          },
+          {
+            "component": "text",
+            "name": "prefix",
+            "label": "Value Prefix",
+            "valueType": "string",
+            "description": "Text prepended to the value display, e.g. ₹"
+          },
+          {
+            "component": "text",
+            "name": "suffix",
+            "label": "Value Suffix",
+            "valueType": "string",
+            "description": "Text appended to the value display, e.g. \" months\""
+          },
+          {
+            "component": "number",
+            "name": "tickCount",
+            "label": "Tick Count",
+            "valueType": "number",
+            "description": "Number of tick labels shown below the slider (default: 7)"
+          },
+          {
+            "...": "../../models/form-common/_help-container.json#/fields"
+          }
+        ]
+      }
+    ]
+}
