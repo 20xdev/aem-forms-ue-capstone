@@ -29,6 +29,43 @@ class LoanWizardLayout extends WizardLayout {
       panel.classList.add('no-step-menu');
     }
     this.wireNavButtons(panel);
+    this.wireBackEvent(panel);
+    this.wireGotoEvent(panel);
+  }
+
+  wireBackEvent(panel) {
+    // Remove stale listener from previous render to avoid duplicate navigation calls.
+    if (this.backHandler) {
+      document.removeEventListener('loan-wizard:back', this.backHandler);
+    }
+    this.backHandler = () => {
+      if (document.documentElement.classList.contains('adobe-ue-edit')) return;
+      this.navigate(panel, false);
+    };
+    document.addEventListener('loan-wizard:back', this.backHandler);
+  }
+
+  jumpToStep(panel, stepIndex) {
+    const steps = this.getSteps(panel);
+    const targetStep = steps[stepIndex];
+    if (!targetStep) return;
+    const current = panel.querySelector('.current-wizard-step');
+    if (current === targetStep) return;
+    current?.classList.remove('current-wizard-step');
+    targetStep.classList.add('current-wizard-step');
+    panel.querySelector('.wizard-menu-active-item')?.classList.remove('wizard-menu-active-item');
+    panel.querySelector(`li[data-index="${targetStep.dataset.index}"]`)?.classList.add('wizard-menu-active-item');
+  }
+
+  wireGotoEvent(panel) {
+    if (this.gotoHandler) {
+      document.removeEventListener('loan-wizard:goto', this.gotoHandler);
+    }
+    this.gotoHandler = (e) => {
+      if (document.documentElement.classList.contains('adobe-ue-edit')) return;
+      this.jumpToStep(panel, e.detail?.stepIndex ?? 0);
+    };
+    document.addEventListener('loan-wizard:goto', this.gotoHandler);
   }
 
   // eslint-disable-next-line class-methods-use-this

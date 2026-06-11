@@ -241,6 +241,27 @@ function proceedToNextStep() {
   return '';
 }
 
+/**
+ * Navigates the loan wizard back to the previous step.
+ * Use in Rule Editor for elements inside fragments that cannot reference the wizard directly.
+ * @name goToPrevStep Navigate to the previous wizard step
+ */
+function goToPrevStep() {
+  document.dispatchEvent(new CustomEvent('loan-wizard:back'));
+  return '';
+}
+
+/**
+ * Jumps to a specific loan wizard step by zero-based index.
+ * Use in Rule Editor when you need to skip to a non-adjacent step (e.g. 0 = Welcome step).
+ * @name goToStep Navigate to a specific wizard step
+ * @param {number} stepIndex Zero-based step index (0 = first step, 1 = second, …)
+ */
+function goToStep(stepIndex) {
+  document.dispatchEvent(new CustomEvent('loan-wizard:goto', { detail: { stepIndex } }));
+  return '';
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,
@@ -252,4 +273,6 @@ export {
   calculateEMI,
   submitLoanApplication,
   proceedToNextStep,
+  goToPrevStep,
+  goToStep,
 };
