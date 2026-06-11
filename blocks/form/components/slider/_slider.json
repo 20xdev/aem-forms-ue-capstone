@@ -59,7 +59,8 @@
             "description": "Controls how the value and tick labels are formatted.",
             "options": [
               { "name": "Number", "value": "number" },
-              { "name": "Indian Currency (K / L / Cr)", "value": "inr" }
+              { "name": "Indian Currency (K / L / Cr)", "value": "inr" },
+              { "name": "Months (12m, 24m…)", "value": "months" }
             ]
           },
           {

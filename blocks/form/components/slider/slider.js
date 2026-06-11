@@ -16,6 +16,7 @@ function formatNum(value, format) {
 function abbreviateLabel(value, format) {
   const num = Number(value);
   if (format === 'inr') return abbreviateInr(Math.round(num));
+  if (format === 'months') return `${Math.round(num)}m`;
   return `${Math.round(num)}`;
 }
 

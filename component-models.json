@@ -5362,6 +5362,10 @@
           {
             "name": "Indian Currency (K / L / Cr)",
             "value": "inr"
+          },
+          {
+            "name": "Months (12m, 24m…)",
+            "value": "months"
           }
         ]
       },
