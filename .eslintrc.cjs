@@ -50,6 +50,7 @@ module.exports = {
       password: 20,
       tnc: 12,
       range: 19,
+      slider: 23,
     }],
     'xwalk/no-orphan-collapsible-fields': 'off', // Disable until enhancement is done for Forms properties
   },
