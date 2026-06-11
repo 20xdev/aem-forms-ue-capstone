@@ -195,6 +195,7 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
           const tenureSlider = document.querySelector('[name="loan_tenure_slider_value"]');
           if (tenureSlider) {
             tenureSlider.value = tenureNum;
+            tenureSlider.max = tenureNum;
             tenureSlider.dispatchEvent(new Event('input'));
           }
         }

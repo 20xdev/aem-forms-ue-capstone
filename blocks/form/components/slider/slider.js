@@ -102,12 +102,14 @@ export default async function decorate(fieldDiv, fd) {
   // Correct initial fill (base range.js may have set step-based vars already)
   updateFill(input, wrapper);
 
+  let lastMin = input.min;
   let lastMax = input.max;
   input.addEventListener('input', () => {
     valueBox.textContent = `${prefix}${formatNum(input.value, format)}${suffix}`;
     // Override step-based CSS vars with true value ratio so fill tracks the thumb
     updateFill(input, wrapper);
-    if (input.max !== lastMax) {
+    if (input.min !== lastMin || input.max !== lastMax) {
+      lastMin = input.min;
       lastMax = input.max;
       ticksEl.remove();
       ticksEl = buildTicks(input, format, count);
