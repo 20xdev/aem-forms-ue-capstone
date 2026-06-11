@@ -4385,6 +4385,13 @@
         ]
       },
       {
+        "component": "boolean",
+        "name": "showNavButtons",
+        "label": "Show Built-in Next/Back Buttons",
+        "valueType": "boolean",
+        "value": false
+      },
+      {
         "component": "tab",
         "label": "Help Content",
         "name": "help"
