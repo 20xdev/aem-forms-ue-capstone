@@ -16,6 +16,8 @@ class LoanWizardLayout extends WizardLayout {
   }
 
   applyLayout(panel, showNavButtons) {
+    this.includePrevBtn = !!showNavButtons;
+    this.includeNextBtn = !!showNavButtons;
     super.applyLayout(panel);
     if (!showNavButtons) {
       panel.querySelector('.wizard-button-wrapper')?.remove();
