@@ -102,6 +102,7 @@ function initiateCustomerIdentification(globals) {
         globals.functions.setProperty('offerAvailable', { value: data.responseString.offerAvailable });
         globals.functions.setProperty('existingCustomer', { value: data.responseString.existingCustomer });
         globals.functions.setProperty('bankJourneyID', { value: data.contextParam.bankJourneyID });
+        globals.functions.setProperty('maskedMobile', { value: maskMobileNumber(mobileNo) });
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
         globals.functions.setProperty('apiError', { value: data.status.errorDesc });
