@@ -38,6 +38,6 @@ class LoanWizardLayout extends WizardLayout {
 const layout = new LoanWizardLayout();
 
 export default function loanWizardLayout(panel, fd) {
-  layout.applyLayout(panel, fd?.showNavButtons);
+  layout.applyLayout(panel, fd?.properties?.showNavButtons);
   return panel;
 }
