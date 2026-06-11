@@ -99,19 +99,21 @@ function initiateCustomerIdentification(globals) {
     .then((response) => response.json())
     .then((data) => {
       if (data?.status?.responseCode === '0') {
-        globals.functions.setProperty('offerAvailable', { value: data.responseString.offerAvailable });
-        globals.functions.setProperty('existingCustomer', { value: data.responseString.existingCustomer });
-        globals.functions.setProperty('bankJourneyID', { value: data.contextParam.bankJourneyID });
-        globals.functions.setProperty('maskedMobile', { value: maskMobileNumber(mobileNo) });
+        globals.functions.importData({
+          offerAvailable: data.responseString.offerAvailable,
+          existingCustomer: data.responseString.existingCustomer,
+          bankJourneyID: data.contextParam.bankJourneyID,
+          maskedMobile: maskMobileNumber(mobileNo),
+        });
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
-        globals.functions.setProperty('apiError', { value: data.status.errorDesc });
+        globals.functions.importData({ apiError: data.status.errorDesc });
         document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: data.status.errorDesc } }));
       }
     })
     .catch(() => {
       const msg = 'Unable to reach server. Please try again.';
-      globals.functions.setProperty('apiError', { value: msg });
+      globals.functions.importData({ apiError: msg });
       document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: msg } }));
     });
   return '';
@@ -125,7 +127,7 @@ function initiateCustomerIdentification(globals) {
  */
 function verifyOTPAndGetDemogDetails(otp, globals) {
   if (!otp || String(otp).length !== 6) return '';
-  const bankJourneyID = globals.functions.getProperty('bankJourneyID')?.value
+  const bankJourneyID = globals.functions.exportData().bankJourneyID
     || CONTEXT_PARAM.bankJourneyID;
   const payload = {
     contextParam: { ...CONTEXT_PARAM, bankJourneyID },
@@ -144,27 +146,29 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
       if (data?.status?.responseCode === '0') {
         const customer = data.responseString.OfferDemogDetails?.[0];
         if (customer) {
-          globals.functions.setProperty('customerFirstName', { value: customer.customerFirstName });
-          globals.functions.setProperty('customerLastName', { value: customer.customerLastName });
-          globals.functions.setProperty('customerCity', { value: customer.customerCity });
-          globals.functions.setProperty('customerState', { value: customer.customerState });
-          globals.functions.setProperty('emailAddress', { value: customer.emailAddress });
-          globals.functions.setProperty('offerAmount', { value: customer.offerAmount });
-          globals.functions.setProperty('offerType', { value: customer.offerType });
-          globals.functions.setProperty('tenure', { value: customer.tenure });
-          globals.functions.setProperty('rateOfInterest', { value: customer.rateOfInterest });
-          globals.functions.setProperty('customerID', { value: customer.customerID });
-          globals.functions.setProperty('accountNumber', { value: customer.accountNumber });
+          globals.functions.importData({
+            customerFirstName: customer.customerFirstName,
+            customerLastName: customer.customerLastName,
+            customerCity: customer.customerCity,
+            customerState: customer.customerState,
+            emailAddress: customer.emailAddress,
+            offerAmount: customer.offerAmount,
+            offerType: customer.offerType,
+            tenure: customer.tenure,
+            rateOfInterest: customer.rateOfInterest,
+            customerID: customer.customerID,
+            accountNumber: customer.accountNumber,
+          });
         }
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
-        globals.functions.setProperty('otpError', { value: data.status.errorDesc });
+        globals.functions.importData({ otpError: data.status.errorDesc });
         document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: data.status.errorDesc } }));
       }
     })
     .catch(() => {
       const msg = 'OTP verification failed. Please try again.';
-      globals.functions.setProperty('otpError', { value: msg });
+      globals.functions.importData({ otpError: msg });
       document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: msg } }));
     });
   return '';
@@ -217,16 +221,17 @@ function submitLoanApplication(globals) {
     .then((response) => response.json())
     .then((result) => {
       if (result?.status?.responseCode === '0') {
-        globals.functions.setProperty('acknowledgementId', { value: result.responseString.acknowledgementId });
+        const { acknowledgementId } = result.responseString;
+        globals.functions.importData({ acknowledgementId });
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
-        globals.functions.setProperty('apiError', { value: result.status.errorDesc });
+        globals.functions.importData({ apiError: result.status.errorDesc });
         document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: result.status.errorDesc } }));
       }
     })
     .catch(() => {
       const msg = 'Loan submission failed. Please try again.';
-      globals.functions.setProperty('apiError', { value: msg });
+      globals.functions.importData({ apiError: msg });
       document.dispatchEvent(new CustomEvent('loan-wizard:cancel', { detail: { error: msg } }));
     });
   return '';
