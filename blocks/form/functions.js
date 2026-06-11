@@ -193,7 +193,10 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
             loanSlider.dispatchEvent(new Event('input'));
           }
           const tenureSlider = document.querySelector('[name="loan_tenure_slider_value"]');
-          if (tenureSlider) tenureSlider.dispatchEvent(new Event('input'));
+          if (tenureSlider) {
+            tenureSlider.value = tenureNum;
+            tenureSlider.dispatchEvent(new Event('input'));
+          }
         }
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
       } else {
