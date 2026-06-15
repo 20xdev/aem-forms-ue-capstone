@@ -84,6 +84,17 @@ function calculateEMI(principal, annualRate, tenureMonths) {
 }
 
 /**
+ * Returns DOB formatted as DDMMYYYY string for use as API identifier value
+ * @name getFormattedDob Returns DOB as DDMMYYYY string
+ * @param {scope} globals
+ * @return {string}
+ */
+function getFormattedDob(globals) {
+  const dob = globals.functions.exportData().dob || '';
+  return dob ? String(dob).replace(/-/g, '') : '';
+}
+
+/**
  * Initiates customer identification — called when OTP step initializes
  * @name initiateCustomerIdentification Sends mobile and PAN/DOB to identify customer
  * @param {scope} globals
@@ -313,6 +324,7 @@ function recalculateEMI(globals) {
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,
+  getFormattedDob,
   days,
   submitFormArrayToString,
   maskMobileNumber,
