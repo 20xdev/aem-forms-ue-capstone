@@ -69,12 +69,14 @@ function buildTicks(input, format, count) {
  *   stepValue number            — slider step (passed through to base range)
  */
 export default async function decorate(fieldDiv, fd) {
-  const {
-    format = 'number',
-    prefix = '',
-    suffix = '',
-    tickCount = 7,
-  } = fd?.properties ?? {};
+  // eslint-disable-next-line no-console
+  console.log('[slider] fd for', fd?.name, '→ fd.format:', fd?.format, '| fd.properties:', JSON.stringify(fd?.properties));
+  const props = fd?.properties ?? {};
+  // 'format' can be promoted to top-level fd by AEM Forms (JSON-Schema keyword); check both
+  const format = props.format || fd?.format || 'number';
+  const prefix = props.prefix ?? '';
+  const suffix = props.suffix ?? '';
+  const tickCount = props.tickCount ?? 7;
   const count = Math.max(2, Number(tickCount) || 7);
 
   await rangeDecorate(fieldDiv, fd);
@@ -85,8 +87,8 @@ export default async function decorate(fieldDiv, fd) {
   const input = wrapper.querySelector('input[type="range"]');
   wrapper.classList.add('slider-track');
 
-  // Remove base elements we replace with richer alternatives
-  wrapper.querySelector('.range-bubble')?.remove();
+  // Keep .range-bubble in DOM (hidden via CSS) so range.js updateBubble does not throw.
+  // Remove only the min/max label spans we replace with tick labels.
   wrapper.querySelector('.range-min')?.remove();
   wrapper.querySelector('.range-max')?.remove();
 

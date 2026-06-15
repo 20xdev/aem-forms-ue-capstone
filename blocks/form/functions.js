@@ -184,18 +184,20 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
             emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
             offer_banner_text: `You can get a loan up to ₹${offerAmountNum.toLocaleString('en-IN')}!`,
           });
-          // input.max and input.value are HTML attributes; importData cannot update them.
-          // Dispatch 'input' so the slider component re-renders its value box and ticks.
+          // input.min/max/value are HTML attributes; importData cannot update them.
+          // Set max BEFORE value so the browser does not clamp value to the old max.
           const loanSlider = document.querySelector('[name="loan_amount_slider_value"]');
           if (loanSlider) {
-            loanSlider.value = offerAmountNum;
-            loanSlider.max = offerAmountNum;
+            loanSlider.min = '50000';
+            loanSlider.max = String(offerAmountNum);
+            loanSlider.value = String(offerAmountNum);
             loanSlider.dispatchEvent(new Event('input'));
           }
           const tenureSlider = document.querySelector('[name="loan_tenure_slider_value"]');
           if (tenureSlider) {
-            tenureSlider.value = tenureNum;
-            tenureSlider.max = tenureNum;
+            tenureSlider.min = '12';
+            tenureSlider.max = String(tenureNum);
+            tenureSlider.value = String(tenureNum);
             tenureSlider.dispatchEvent(new Event('input'));
           }
         }
