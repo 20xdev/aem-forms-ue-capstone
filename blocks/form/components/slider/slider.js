@@ -69,11 +69,9 @@ function buildTicks(input, format, count) {
  *   stepValue number            — slider step (passed through to base range)
  */
 export default async function decorate(fieldDiv, fd) {
-  // eslint-disable-next-line no-console
-  console.log('[slider] fd for', fd?.name, '→ fd.format:', fd?.format, '| fd.properties:', JSON.stringify(fd?.properties));
   const props = fd?.properties ?? {};
-  // 'format' can be promoted to top-level fd by AEM Forms (JSON-Schema keyword); check both
-  const format = props.format || fd?.format || 'number';
+  // 'format' is reserved by AEM Forms (JSON-Schema); use 'labelFormat'. Fall back for old content.
+  const format = props.labelFormat || props.format || fd?.format || 'number';
   const prefix = props.prefix ?? '';
   const suffix = props.suffix ?? '';
   const tickCount = props.tickCount ?? 7;

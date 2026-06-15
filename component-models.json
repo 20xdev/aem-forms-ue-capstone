@@ -5350,7 +5350,7 @@
       },
       {
         "component": "select",
-        "name": "format",
+        "name": "labelFormat",
         "label": "Number Format",
         "valueType": "string",
         "description": "Controls how the value and tick labels are formatted.",
