@@ -534,6 +534,124 @@ main .form .field-editmobilebtn button:hover {
 }
 
 /* ============================================
+   CUSTOMER PROFILE FRAGMENT
+   ============================================ */
+
+/* Outer accordion wrapper legend + redundant inner panel legends */
+.field-panelcontainer1781534167038 > legend,
+.field-employer-details-panel > legend,
+.field-income-details-panel > legend,
+.field-work-email-panel > legend,
+.field-loan-type-panel > legend {
+  display: none;
+}
+
+/* Section cards */
+.field-customer-details-panel,
+.field-pan-name-panel,
+.field-personal-details-panel,
+.field-address-details-panel {
+  border: 1px solid #dde3f0;
+  border-radius: 8px;
+  padding: 0 16px 16px;
+}
+
+/* Section card header legends — full-width breakout technique */
+.field-customer-details-panel > legend,
+.field-pan-name-panel > legend,
+.field-personal-details-panel > legend,
+.field-address-details-panel > legend {
+  display: block;
+  width: calc(100% + 32px);
+  margin: 0 -16px 16px;
+  background: #eef1fb;
+  color: #131313;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid #dde3f0;
+}
+
+/* Read-only display: Aadhaar name */
+.field-customer-details-panel .field-full-name-as-per-aadhaar label {
+  font-size: 0.78rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.field-customer-details-panel .field-full-name-as-per-aadhaar input {
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: #131313;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* Read-only display: Aadhaar address */
+.field-address-details-panel .field-aadhaar-record-address label {
+  font-size: 0.78rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.field-address-details-panel .field-aadhaar-record-address input {
+  border: none;
+  background: transparent;
+  font-weight: 500;
+  color: #131313;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* Verify buttons — inline link style (parent panel scoped to match edit-mobile specificity) */
+main .form .field-personal-details-panel .field-verify-personal-email button,
+main .form .field-work-email-panel .field-verify-work-email button {
+  background: none;
+  border: none;
+  color: #004c8f;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  width: auto;
+  margin: 0;
+  text-decoration: none;
+}
+
+main .form .field-personal-details-panel .field-verify-personal-email button:hover,
+main .form .field-work-email-panel .field-verify-work-email button:hover {
+  background: none;
+  text-decoration: underline;
+}
+
+/* Bottom-align verify button wrapper with its adjacent email input */
+.field-personal-details-panel .field-verify-personal-email,
+.field-work-email-panel .field-verify-work-email {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Email domain hint — selectors are disjoint in practice (different containers) */
+/* stylelint-disable-next-line no-descending-specificity */
+.field-personal-email-domain-suggestions p p {
+  color: #666;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+/* Accordion item headers */
+.panel-wrapper.field-panelcontainer1781534167038 .accordion-legend {
+  background: #eef1fb;
+  padding: 12px 16px;
+  border-bottom: 1px solid #dde3f0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #131313;
+}
+
+/* ============================================
    REVIEW / PREVIEW PANEL
    ============================================ */
 
@@ -563,7 +681,8 @@ main .form .field-editmobilebtn button:hover {
   margin-bottom: 0;
 }
 
-/* Subtitle */
+/* Subtitle — disjoint from .field-personal-email-domain-suggestions p p (different containers) */
+/* stylelint-disable-next-line no-descending-specificity */
 .field-review-details-helper-text p {
   color: #666;
   font-size: 0.875rem;
