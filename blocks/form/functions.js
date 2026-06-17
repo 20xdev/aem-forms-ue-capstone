@@ -3,7 +3,7 @@
 function getApiBase() {
   return (window.loanFormConfig ?? {}).apiBaseUrl
     || document.querySelector('meta[name="api-base-url"]')?.content
-    || '';
+    || 'https://mock-apis-g29l.onrender.com';
 }
 
 const CONTEXT_PARAM = {
