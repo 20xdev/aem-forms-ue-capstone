@@ -1,0 +1,59 @@
+.bank-selector-cards {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  scrollbar-width: none;
+}
+
+.bank-selector-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.bank-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 10px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  cursor: pointer;
+  min-width: 72px;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.bank-card:hover {
+  border-color: #aac4e8;
+}
+
+.bank-card.selected {
+  border-color: #004c8f;
+  box-shadow: 0 0 0 1px #004c8f;
+}
+
+.bank-logo {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bank-logo img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.bank-name {
+  font-size: 0.68rem;
+  color: #333;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 64px;
+}
