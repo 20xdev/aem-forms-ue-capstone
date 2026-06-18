@@ -299,6 +299,7 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
             middle_name_pan: customer.customerMiddleName || '',
             last_name_pan: customer.customerLastName || '',
             monthly_net_income: customer.monthlyIncome || '',
+            industry_type: customer.profession || '',
           });
           // Set slider HTML attributes (importData cannot update input.min/max/value).
           // max must be set before value to prevent browser clamping.
