@@ -294,10 +294,6 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
             monthly_net_income: customer.monthlyIncome || '',
             industry_type: customer.profession || '',
           });
-          // Set slider HTML attributes (importData cannot update input.min/max/value).
-          // max must be set before value to prevent browser clamping.
-          setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
-          setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
         }
         trackEvent('otp_success');
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
@@ -422,6 +418,7 @@ function getBureauOfferAndProceed(globals) {
         const tenureNum = parseInt(offer.tenure, 10) || 36;
         const rateNum = parseFloat(offer.rateOfInterest) || 0;
         const pf = calculateProcessingFee(offerAmountNum);
+        const formattedAmount = `₹${offerAmountNum.toLocaleString('en-IN')}`;
         globals.functions.importData({
           offerAmount: offerAmountNum,
           offerType: offer.offerType || '',
@@ -433,13 +430,22 @@ function getBureauOfferAndProceed(globals) {
           emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
           processingFees: pf,
           taxes: calculateTaxes(pf),
-          offer_banner_text: `You can get a loan up to ₹${offerAmountNum.toLocaleString('en-IN')}!`,
+          summary_amount: formattedAmount,
+          offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
           apiError: '',
         });
-        setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
-        setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
         trackEvent('bureau_offer_received', { offerType: offer.offerType });
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
+        // Runs after proceed so offer panel is in the active DOM
+        requestAnimationFrame(() => {
+          setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
+          setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
+          // Sites Text component: not in form model, update DOM directly
+
+          const bannerEl = document.querySelector('[name="offer_banner_text"] p')
+            || document.querySelector('[name="offer_banner_text"]');
+          if (bannerEl) bannerEl.textContent = `You can get a loan up to ${formattedAmount}!`;
+        });
       } else {
         globals.functions.importData({ apiError: data.status.errorDesc });
         trackEvent('bureau_offer_failed', { errorCode: data.status.errorCode });
