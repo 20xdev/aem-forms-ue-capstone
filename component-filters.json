@@ -71,9 +71,7 @@
       "range",
       "slider",
       "card-choice",
-      "loan-wizard",
-      "bank-selector",
-      "income-verify-card"
+      "loan-wizard"
     ]
   }
 ]

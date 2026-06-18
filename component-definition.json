@@ -755,47 +755,6 @@
               }
             }
           }
-        },
-        {
-          "title": "Bank Selector",
-          "id": "bank-selector",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
-                "template": {
-                  "jcr:title": "Bank Selector",
-                  "fieldType": "radio-group",
-                  "fd:viewType": "bank-selector",
-                  "orientation": "horizontal",
-                  "enum": ["hdfc", "icici", "axis", "kotak", "sbi", "bob", "idfc"],
-                  "enumNames": ["HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak", "SBI", "Bank of Baroda", "IDFC First"]
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Income Verify Options",
-          "id": "income-verify-card",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
-                "template": {
-                  "jcr:title": "Income Verify Options",
-                  "fieldType": "radio-group",
-                  "fd:viewType": "income-verify-card",
-                  "orientation": "horizontal",
-                  "enum": ["account-aggregator", "salary-account", "bank-statement"],
-                  "enumNames": ["Account Aggregator", "Login to Salary Account", "Upload Bank Statement"],
-                  "optionDescriptions": ["Instant & secure, processed via RBI-regulated partner.", "Quick & hassle-free, processed via NetBanking.", "Processed via uploading bank statement of the last 6 months."],
-                  "badgeOption": "account-aggregator",
-                  "badgeText": "Recommended"
-                }
-              }
-            }
-          }
         }
       ]
     }

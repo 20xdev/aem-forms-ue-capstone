@@ -1,0 +1,35 @@
+{
+  "models": [
+    {
+      "id": "bank-selector",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "component": "text",
+          "name": "enum",
+          "label": "Options (Data Value)",
+          "valueType": "string",
+          "multi": true,
+          "required": true
+        },
+        {
+          "component": "text",
+          "name": "enumNames",
+          "label": "Options (Display Name)",
+          "valueType": "string",
+          "multi": true
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        }
+      ]
+    }
+  ]
+}

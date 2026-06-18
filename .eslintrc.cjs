@@ -52,6 +52,7 @@ module.exports = {
       range: 19,
       slider: 23,
       'income-verify-card': 16,
+      'bank-selector': 15,
     }],
     'xwalk/no-orphan-collapsible-fields': 'off', // Disable until enhancement is done for Forms properties
   },
