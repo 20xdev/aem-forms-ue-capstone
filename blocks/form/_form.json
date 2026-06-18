@@ -224,7 +224,9 @@
         "range",
         "slider",
         "card-choice",
-        "loan-wizard"
+        "loan-wizard",
+        "bank-selector",
+        "income-verify-card"
       ]
     }
   ]
