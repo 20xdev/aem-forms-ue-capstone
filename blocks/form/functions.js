@@ -626,8 +626,16 @@ function recalculateEMI(globals) {
   const tenure = parseInt(data.loan_tenure_slider_value, 10) || 1;
   const emi = calculateEMI(principal, rate, tenure);
   const pf = calculateProcessingFee(principal);
-  globals.functions.importData({ emi_amount: emi, processingFees: pf, taxes: calculateTaxes(pf) });
-  trackEvent('emi_recalculated', { tenure });
+  const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
+  globals.functions.importData({
+    emi_amount: emi,
+    processingFees: pf,
+    taxes: calculateTaxes(pf),
+    summary_amount: formattedAmount,
+    offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
+    loan_tenure_display: `${tenure} months`,
+  });
+  trackEvent('emi_recalculated', { principal, tenure });
   return emi;
 }
 
