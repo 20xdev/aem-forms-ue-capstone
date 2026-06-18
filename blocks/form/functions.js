@@ -401,10 +401,6 @@ function getBureauOfferAndProceed(globals) {
       resiPincode: d.zipCode || '',
       accountNumber: d.accountNumber || '',
       customerID: d.customerID || '',
-      employerName: d.employer_company_name || d.employerName || '',
-      industryType: d.industry_type || '',
-      monthlyIncome: d.monthly_net_income || d.monthlyIncome || '',
-      loanType: d.loan_type || '',
       assistedJourney: '',
       channel: '',
       branchCode: '',
@@ -414,7 +410,11 @@ function getBureauOfferAndProceed(globals) {
       lgCode: '',
       lcCode: '',
       crmPromoCode: '',
-      fillerFields: {},
+      fillerFields: {
+        filler1: d.pan_number || d.panNo || '',
+        filler2: d.selected_bank || '',
+        filler3: d.income_verify_method || '',
+      },
     },
   };
   trackEvent('bureau_offer_requested');

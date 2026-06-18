@@ -5,6 +5,20 @@ export default async function decorate(fieldDiv) {
 
   optionDivs.forEach((d) => { d.style.display = 'none'; });
 
+  // Find the sibling "other bank" field — the next field-wrapper after this one
+  const formWrapper = fieldDiv.closest('.form-wrapper, form, [data-component]');
+  const getOtherField = () => (formWrapper
+    ? formWrapper.querySelector('[data-component="other_bank_name"], [name="other_bank_name"]')
+      || fieldDiv.parentElement?.nextElementSibling?.querySelector('select, input[type="text"]')
+    : null);
+
+  const toggleOtherField = (show) => {
+    const other = getOtherField();
+    if (!other) return;
+    const wrapper = other.closest('.field-wrapper') || other.parentElement;
+    if (wrapper) wrapper.style.display = show ? '' : 'none';
+  };
+
   const cardsWrap = document.createElement('div');
   cardsWrap.className = 'bank-selector-cards';
 
@@ -35,9 +49,15 @@ export default async function decorate(fieldDiv) {
     input.addEventListener('change', () => {
       cardsWrap.querySelectorAll('.bank-card').forEach((c) => c.classList.remove('selected'));
       card.classList.add('selected');
+      toggleOtherField(input.value === 'other');
     });
   });
 
   fieldDiv.append(cardsWrap);
+
+  // Set initial visibility based on current value
+  const checkedInput = inputs.find((i) => i.checked);
+  toggleOtherField(checkedInput?.value === 'other');
+
   return fieldDiv;
 }

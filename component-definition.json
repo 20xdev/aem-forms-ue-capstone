@@ -775,7 +775,8 @@
                     "kotak",
                     "sbi",
                     "bob",
-                    "idfc"
+                    "idfc",
+                    "other"
                   ],
                   "enumNames": [
                     "HDFC Bank",
@@ -784,7 +785,8 @@
                     "Kotak",
                     "SBI",
                     "Bank of Baroda",
-                    "IDFC First"
+                    "IDFC First",
+                    "Other Bank"
                   ]
                 }
               }

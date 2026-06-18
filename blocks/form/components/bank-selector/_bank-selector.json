@@ -12,8 +12,8 @@
               "fieldType": "radio-group",
               "fd:viewType": "bank-selector",
               "orientation": "horizontal",
-              "enum": ["hdfc", "icici", "axis", "kotak", "sbi", "bob", "idfc"],
-              "enumNames": ["HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak", "SBI", "Bank of Baroda", "IDFC First"]
+              "enum": ["hdfc", "icici", "axis", "kotak", "sbi", "bob", "idfc", "other"],
+              "enumNames": ["HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak", "SBI", "Bank of Baroda", "IDFC First", "Other Bank"]
             }
           }
         }
