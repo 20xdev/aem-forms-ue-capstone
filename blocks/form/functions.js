@@ -440,11 +440,6 @@ function getBureauOfferAndProceed(globals) {
         requestAnimationFrame(() => {
           setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
           setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
-          // Sites Text component: not in form model, update DOM directly
-
-          const bannerEl = document.querySelector('[name="offer_banner_text"] p')
-            || document.querySelector('[name="offer_banner_text"]');
-          if (bannerEl) bannerEl.textContent = `You can get a loan up to ${formattedAmount}!`;
         });
       } else {
         globals.functions.importData({ apiError: data.status.errorDesc });
