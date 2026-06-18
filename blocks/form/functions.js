@@ -239,7 +239,6 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
         if (customer) {
           const offerAmountNum = parseFloat(customer.offerAmount) || 0;
           const tenureNum = parseInt(customer.tenure, 10) || 36;
-          const rateNum = parseFloat(customer.rateOfInterest) || 0;
           const formData = globals.functions.exportData();
 
           const fullName = [
@@ -277,17 +276,11 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
             customerDob: customer.dateOfBirth,
             emailAddress: customer.emailAddress,
             offerAmount: offerAmountNum,
-            offerType: customer.offerType,
+            offerType: customer.offerType || '',
             tenure: tenureNum,
-            rateOfInterest: rateNum,
+            rateOfInterest: customer.rateOfInterest || '',
             customerID: customer.customerID,
             accountNumber: customer.accountNumber,
-            loan_amount_slider_value: offerAmountNum,
-            loan_tenure_slider_value: tenureNum,
-            emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
-            processingFees: calculateProcessingFee(offerAmountNum),
-            taxes: calculateTaxes(calculateProcessingFee(offerAmountNum)),
-            offer_banner_text: `You can get a loan up to ₹${offerAmountNum.toLocaleString('en-IN')}!`,
             otpError: '',
             // Customer Details form field bindings
             full_name_as_per_aadhaar: fullName,
@@ -428,16 +421,18 @@ function getBureauOfferAndProceed(globals) {
         const offerAmountNum = parseFloat(offer.offerAmount) || 0;
         const tenureNum = parseInt(offer.tenure, 10) || 36;
         const rateNum = parseFloat(offer.rateOfInterest) || 0;
+        const pf = calculateProcessingFee(offerAmountNum);
         globals.functions.importData({
           offerAmount: offerAmountNum,
           offerType: offer.offerType || '',
           tenure: tenureNum,
-          rateOfInterest: rateNum,
+          rateOfInterest: offer.rateOfInterest || '',
+          kycFlag: offer.kycFlag || '',
           loan_amount_slider_value: offerAmountNum,
           loan_tenure_slider_value: tenureNum,
           emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
-          processingFees: calculateProcessingFee(offerAmountNum),
-          taxes: calculateTaxes(calculateProcessingFee(offerAmountNum)),
+          processingFees: pf,
+          taxes: calculateTaxes(pf),
           offer_banner_text: `You can get a loan up to ₹${offerAmountNum.toLocaleString('en-IN')}!`,
           apiError: '',
         });
