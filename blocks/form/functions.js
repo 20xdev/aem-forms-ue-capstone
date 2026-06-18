@@ -242,10 +242,15 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
           const rateNum = parseFloat(customer.rateOfInterest) || 0;
           const formData = globals.functions.exportData();
 
-          const fullName = [customer.customerFirstName, customer.customerLastName].filter(Boolean).join(' ');
+          const fullName = [
+            customer.customerFirstName,
+            customer.customerMiddleName,
+            customer.customerLastName,
+          ].filter(Boolean).join(' ');
           const addressParts = [
             customer.customerAddress1,
             customer.customerAddress2,
+            customer.customerAddress3,
             customer.customerCity,
             customer.customerState,
             customer.zipCode,
@@ -260,11 +265,13 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
           globals.functions.importData({
             // Internal keys used by subsequent API calls
             customerFirstName: customer.customerFirstName,
+            customerMiddleName: customer.customerMiddleName,
             customerLastName: customer.customerLastName,
             customerCity: customer.customerCity,
             customerState: customer.customerState,
             customerAddress1: customer.customerAddress1,
             customerAddress2: customer.customerAddress2,
+            customerAddress3: customer.customerAddress3,
             zipCode: customer.zipCode,
             customerGender: customer.customerGender,
             customerDob: customer.dateOfBirth,
@@ -289,7 +296,9 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
             personal_email_id: customer.emailAddress || '',
             aadhaar_record_address: fullAddress,
             first_name_pan: customer.customerFirstName || '',
+            middle_name_pan: customer.customerMiddleName || '',
             last_name_pan: customer.customerLastName || '',
+            monthly_net_income: customer.monthlyIncome || '',
           });
           // Set slider HTML attributes (importData cannot update input.min/max/value).
           // max must be set before value to prevent browser clamping.
