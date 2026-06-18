@@ -240,7 +240,25 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
           const offerAmountNum = parseFloat(customer.offerAmount) || 0;
           const tenureNum = parseInt(customer.tenure, 10) || 36;
           const rateNum = parseFloat(customer.rateOfInterest) || 0;
+          const formData = globals.functions.exportData();
+
+          const fullName = [customer.customerFirstName, customer.customerLastName].filter(Boolean).join(' ');
+          const addressParts = [
+            customer.customerAddress1,
+            customer.customerAddress2,
+            customer.customerCity,
+            customer.customerState,
+            customer.zipCode,
+          ].filter(Boolean);
+          const fullAddress = addressParts.join(', ');
+
+          const genderMap = {
+            M: 'Male', F: 'Female', Male: 'Male', Female: 'Female',
+          };
+          const genderValue = genderMap[customer.customerGender] || customer.customerGender || '';
+
           globals.functions.importData({
+            // Internal keys used by subsequent API calls
             customerFirstName: customer.customerFirstName,
             customerLastName: customer.customerLastName,
             customerCity: customer.customerCity,
@@ -264,6 +282,14 @@ function verifyOTPAndGetDemogDetails(otp, globals) {
             taxes: calculateTaxes(calculateProcessingFee(offerAmountNum)),
             offer_banner_text: `You can get a loan up to ₹${offerAmountNum.toLocaleString('en-IN')}!`,
             otpError: '',
+            // Customer Details form field bindings
+            full_name_as_per_aadhaar: fullName,
+            gender: genderValue,
+            pan_number: formData.panNo || '',
+            personal_email_id: customer.emailAddress || '',
+            aadhaar_record_address: fullAddress,
+            first_name_pan: customer.customerFirstName || '',
+            last_name_pan: customer.customerLastName || '',
           });
           // Set slider HTML attributes (importData cannot update input.min/max/value).
           // max must be set before value to prevent browser clamping.
