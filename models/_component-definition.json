@@ -51,6 +51,12 @@
         },
         {
           "...": "../blocks/form/components/slider/_slider.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/bank-selector/_bank-selector.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/income-verify-card/_income-verify-card.json#/definitions"
         }
       ]
     }

@@ -1,4 +1,25 @@
 {
+  "definitions": [
+    {
+      "title": "Bank Selector",
+      "id": "bank-selector",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
+            "template": {
+              "jcr:title": "Bank Selector",
+              "fieldType": "radio-group",
+              "fd:viewType": "bank-selector",
+              "orientation": "horizontal",
+              "enum": ["hdfc", "icici", "axis", "kotak", "sbi", "bob", "idfc"],
+              "enumNames": ["HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak", "SBI", "Bank of Baroda", "IDFC First"]
+            }
+          }
+        }
+      }
+    }
+  ],
   "models": [
     {
       "id": "bank-selector",

@@ -1,4 +1,28 @@
 {
+  "definitions": [
+    {
+      "title": "Income Verify Options",
+      "id": "income-verify-card",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
+            "template": {
+              "jcr:title": "Income Verify Options",
+              "fieldType": "radio-group",
+              "fd:viewType": "income-verify-card",
+              "orientation": "horizontal",
+              "enum": ["account-aggregator", "salary-account", "bank-statement"],
+              "enumNames": ["Account Aggregator", "Login to Salary Account", "Upload Bank Statement"],
+              "optionDescriptions": ["Instant & secure, processed via RBI-regulated partner.", "Quick & hassle-free, processed via NetBanking.", "Processed via uploading bank statement of the last 6 months."],
+              "badgeOption": "account-aggregator",
+              "badgeText": "Recommended"
+            }
+          }
+        }
+      }
+    }
+  ],
   "models": [
     {
       "id": "income-verify-card",
