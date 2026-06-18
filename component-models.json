@@ -4156,6 +4156,31 @@
       },
       {
         "component": "tab",
+        "label": "Validation",
+        "name": "validation"
+      },
+      {
+        "component": "boolean",
+        "name": "required",
+        "label": "Required",
+        "valueType": "boolean"
+      },
+      {
+        "component": "text",
+        "name": "mandatoryMessage",
+        "label": "Error message",
+        "valueType": "string",
+        "description": "Error message shown when required field is left empty."
+      },
+      {
+        "component": "text",
+        "name": "validateExpMessage",
+        "label": "Script validation message",
+        "valueType": "string",
+        "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
         "label": "Help Content",
         "name": "help"
       },
@@ -4575,6 +4600,31 @@
         "label": "Badge Text",
         "valueType": "string",
         "description": "Text shown in the badge strip (e.g. Recommended)"
+      },
+      {
+        "component": "tab",
+        "label": "Validation",
+        "name": "validation"
+      },
+      {
+        "component": "boolean",
+        "name": "required",
+        "label": "Required",
+        "valueType": "boolean"
+      },
+      {
+        "component": "text",
+        "name": "mandatoryMessage",
+        "label": "Error message",
+        "valueType": "string",
+        "description": "Error message shown when required field is left empty."
+      },
+      {
+        "component": "text",
+        "name": "validateExpMessage",
+        "label": "Script validation message",
+        "valueType": "string",
+        "description": "Displayed when validation script fails."
       },
       {
         "component": "tab",
