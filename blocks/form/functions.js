@@ -628,7 +628,6 @@ function initOfferPanel(globals) {
     taxes: calculateTaxes(pf),
     summary_amount: formattedAmount,
     offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
-    loan_tenure_display: `${tenureNum} months`,
   });
   setTimeout(() => {
     setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
@@ -648,16 +647,16 @@ function initOfferPanel(globals) {
  * @param {number} loanAmount Bind to loan_amount_slider_value in Rule Editor
  * @param {number} tenureMonths Bind to loan_tenure_slider_value in Rule Editor
  * @param {scope} globals
- * @return {number} Updated EMI amount
+ * @return {string} Empty string — use Call Function, not Set Value, in Rule Editor
  */
 function recalculateEMI(loanAmount, tenureMonths, globals) {
   const principal = parseFloat(loanAmount) || 0;
   const fd = globals.functions.exportData();
-  // tenureMonths may be 0 if the user never moved the tenure slider;
+  // tenureMonths may be null if the tenure slider was never user-committed;
   // fall back to the tenure field set by the bureau offer API
   const tenure = parseInt(tenureMonths, 10) || parseInt(fd.tenure, 10) || 0;
   const rate = parseFloat(fd.rateOfInterest) || 0;
-  if (!principal || !tenure) return 0;
+  if (!principal || !tenure) return '';
   const emi = calculateEMI(principal, rate, tenure);
   const pf = calculateProcessingFee(principal);
   const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
@@ -670,13 +669,12 @@ function recalculateEMI(loanAmount, tenureMonths, globals) {
     ['taxes', calculateTaxes(pf)],
     ['summary_amount', formattedAmount],
     ['offer_banner_text', `You can get a loan up to ${formattedAmount}!`],
-    ['loan_tenure_display', `${tenure} months`],
   ].forEach(([name, val]) => {
     const el = document.querySelector(`[name="${name}"]`);
     if (el) el.value = String(val);
   });
   trackEvent('emi_recalculated', { principal, tenure });
-  return emi;
+  return '';
 }
 
 /**
@@ -705,7 +703,6 @@ function finalizeAndProceedToPreview(globals) {
     taxes: calculateTaxes(pf),
     summary_amount: formattedAmount,
     offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
-    loan_tenure_display: `${tenure} months`,
   });
   document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
   return '';
@@ -735,7 +732,6 @@ function initPreviewPanel(globals) {
     taxes: calculateTaxes(pf),
     emi_amount: calculateEMI(principal, rate, tenure),
     summary_amount: formattedAmount,
-    loan_tenure_display: `${tenure} months`,
   });
   return '';
 }
