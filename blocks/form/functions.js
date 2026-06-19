@@ -359,6 +359,83 @@ function panEnquiry(globals) {
   return '';
 }
 
+// ---- Offer panel helpers (defined here so getBureauOfferAndProceed can call them) ---
+
+/**
+ * Recalculates EMI from current slider DOM values. Called directly from input event
+ * listeners wired in initOfferPanel — NOT from Rule Editor. Using Rule Editor
+ * "Set Value of X to recalculateEMI()" causes an infinite re-fire loop because
+ * the return value gets written back into a field that re-triggers the rule.
+ * @name recalculateEMI Recalculates EMI from current slider values
+ * @param {number} loanAmount Current loan_amount_slider_value (DOM value)
+ * @param {number} tenureMonths Current loan_tenure_slider_value (DOM value)
+ * @param {scope} globals
+ * @return {string}
+ */
+function recalculateEMI(loanAmount, tenureMonths, globals) {
+  const principal = parseFloat(loanAmount) || 0;
+  const fd = globals.functions.exportData();
+  // tenureMonths comes directly from the slider DOM value so it is never null here;
+  // fall back to the tenure field set by the bureau offer API just in case.
+  const tenure = parseInt(tenureMonths, 10) || parseInt(fd.tenure, 10) || 0;
+  const rate = parseFloat(fd.rateOfInterest) || 0;
+  if (!principal || !tenure) return '';
+  const emi = calculateEMI(principal, rate, tenure);
+  const pf = calculateProcessingFee(principal);
+  const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
+  // importData with display fields only — slider keys are intentionally omitted.
+  // Including loan_amount_slider_value/loan_tenure_slider_value would overwrite the
+  // user's current slider position with the original offer value, causing snap-back.
+  globals.functions.importData({
+    emi_amount: emi,
+    processingFees: pf,
+    taxes: calculateTaxes(pf),
+    summary_amount: formattedAmount,
+    offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
+  });
+  trackEvent('emi_recalculated', { principal, tenure });
+  return '';
+}
+
+/**
+ * Populates offer panel display fields and sets sliders. Called from
+ * getBureauOfferAndProceed 500 ms after navigation — do NOT bind to Initialize
+ * in Rule Editor because AEM Forms fires Initialize for all panels at page load
+ * before bureau data exists.
+ * @name initOfferPanel Populates offer panel display fields and sets sliders on load
+ * @param {scope} globals
+ * @return {string}
+ */
+function initOfferPanel(globals) {
+  const fd = globals.functions.exportData();
+  const offerAmountNum = parseFloat(fd.offerAmount) || 0;
+  const tenureNum = parseInt(fd.tenure, 10) || 36;
+  const rateNum = parseFloat(fd.rateOfInterest) || 0;
+  if (!offerAmountNum) return '';
+  const pf = calculateProcessingFee(offerAmountNum);
+  const formattedAmount = `₹${offerAmountNum.toLocaleString('en-IN')}`;
+  globals.functions.importData({
+    loan_amount_slider_value: offerAmountNum,
+    loan_tenure_slider_value: tenureNum,
+    emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
+    processingFees: pf,
+    taxes: calculateTaxes(pf),
+    summary_amount: formattedAmount,
+    offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
+  });
+  setTimeout(() => {
+    setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
+    setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
+    // Wire live recalculation directly to slider input events — no Rule Editor needed.
+    const amtEl = document.querySelector('[name="loan_amount_slider_value"]');
+    const tenEl = document.querySelector('[name="loan_tenure_slider_value"]');
+    const recalc = () => recalculateEMI(amtEl?.value, tenEl?.value, globals);
+    amtEl?.addEventListener('input', recalc);
+    tenEl?.addEventListener('input', recalc);
+  }, 200);
+  return '';
+}
+
 // ---- Tier 2: Bureau Offer ------------------------------------------------
 
 /**
@@ -430,6 +507,10 @@ function getBureauOfferAndProceed(globals) {
         });
         trackEvent('bureau_offer_received', { offerType: offer.offerType });
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
+        // AEM Forms fires Initialize for every panel at page load, before bureau data
+        // exists. Do NOT bind initOfferPanel to the Initialize event — call it here
+        // after navigation so the offer panel is in the DOM and data is ready.
+        setTimeout(() => initOfferPanel(globals), 500);
       } else {
         globals.functions.importData({ apiError: data.status.errorDesc });
         trackEvent('bureau_offer_failed', { errorCode: data.status.errorCode });
@@ -599,82 +680,6 @@ function goToPrevStep() {
  */
 function goToStep(stepIndex) {
   document.dispatchEvent(new CustomEvent('loan-wizard:goto', { detail: { stepIndex } }));
-  return '';
-}
-
-/**
- * Recalculates EMI from current slider DOM values. Called directly from input event
- * listeners wired in initOfferPanel — NOT from Rule Editor. Using Rule Editor
- * "Set Value of X to recalculateEMI()" causes an infinite re-fire loop because
- * the return value gets written back into a field that re-triggers the rule.
- * @name recalculateEMI Recalculates EMI from current slider values
- * @param {number} loanAmount Current loan_amount_slider_value (DOM value)
- * @param {number} tenureMonths Current loan_tenure_slider_value (DOM value)
- * @param {scope} globals
- * @return {string}
- */
-function recalculateEMI(loanAmount, tenureMonths, globals) {
-  const principal = parseFloat(loanAmount) || 0;
-  const fd = globals.functions.exportData();
-  // tenureMonths comes directly from the slider DOM value so it is never null here;
-  // fall back to the tenure field set by the bureau offer API just in case.
-  const tenure = parseInt(tenureMonths, 10) || parseInt(fd.tenure, 10) || 0;
-  const rate = parseFloat(fd.rateOfInterest) || 0;
-  if (!principal || !tenure) return '';
-  const emi = calculateEMI(principal, rate, tenure);
-  const pf = calculateProcessingFee(principal);
-  const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
-  // importData with display fields only — slider keys are intentionally omitted.
-  // Including loan_amount_slider_value/loan_tenure_slider_value would overwrite the
-  // user's current slider position with the original offer value, causing snap-back.
-  globals.functions.importData({
-    emi_amount: emi,
-    processingFees: pf,
-    taxes: calculateTaxes(pf),
-    summary_amount: formattedAmount,
-    offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
-  });
-  trackEvent('emi_recalculated', { principal, tenure });
-  return '';
-}
-
-/**
- * Initialises the offer panel fields — bind on Initialize of the offer fragment/panel.
- * importData for offer panel fields CANNOT be called before the panel renders because
- * AEM Forms only registers fields in the model once their DOM exists. This function
- * runs after the panel is in the DOM, reads the stored API values (offerAmount, tenure,
- * rateOfInterest) and populates all display fields and sliders.
- * @name initOfferPanel Populates offer panel display fields and sets sliders on load
- * @param {scope} globals
- * @return {string}
- */
-function initOfferPanel(globals) {
-  const fd = globals.functions.exportData();
-  const offerAmountNum = parseFloat(fd.offerAmount) || 0;
-  const tenureNum = parseInt(fd.tenure, 10) || 36;
-  const rateNum = parseFloat(fd.rateOfInterest) || 0;
-  if (!offerAmountNum) return '';
-  const pf = calculateProcessingFee(offerAmountNum);
-  const formattedAmount = `₹${offerAmountNum.toLocaleString('en-IN')}`;
-  globals.functions.importData({
-    loan_amount_slider_value: offerAmountNum,
-    loan_tenure_slider_value: tenureNum,
-    emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
-    processingFees: pf,
-    taxes: calculateTaxes(pf),
-    summary_amount: formattedAmount,
-    offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
-  });
-  setTimeout(() => {
-    setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
-    setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
-    // Wire live recalculation directly to slider input events — no Rule Editor needed.
-    const amtEl = document.querySelector('[name="loan_amount_slider_value"]');
-    const tenEl = document.querySelector('[name="loan_tenure_slider_value"]');
-    const recalc = () => recalculateEMI(amtEl?.value, tenEl?.value, globals);
-    amtEl?.addEventListener('input', recalc);
-    tenEl?.addEventListener('input', recalc);
-  }, 200);
   return '';
 }
 
