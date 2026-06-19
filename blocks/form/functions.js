@@ -417,31 +417,19 @@ function getBureauOfferAndProceed(globals) {
           : data.responseString;
         const offerAmountNum = parseFloat(offer.offerAmount) || 0;
         const tenureNum = parseInt(offer.tenure, 10) || 36;
-        const rateNum = parseFloat(offer.rateOfInterest) || 0;
-        const pf = calculateProcessingFee(offerAmountNum);
-        const formattedAmount = `₹${offerAmountNum.toLocaleString('en-IN')}`;
+        // Store only fields that exist on earlier panels — offer panel fields are
+        // populated by initOfferPanel on the panel's own Initialize event, because
+        // importData for unrendered fields is silently dropped by AEM Forms.
         globals.functions.importData({
           offerAmount: offerAmountNum,
           offerType: offer.offerType || '',
           tenure: tenureNum,
           rateOfInterest: offer.rateOfInterest || '',
           kycFlag: offer.kycFlag || '',
-          loan_amount_slider_value: offerAmountNum,
-          loan_tenure_slider_value: tenureNum,
-          emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
-          processingFees: pf,
-          taxes: calculateTaxes(pf),
-          summary_amount: formattedAmount,
-          offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
           apiError: '',
         });
         trackEvent('bureau_offer_received', { offerType: offer.offerType });
         document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
-        // Runs after proceed so offer panel is in the active DOM
-        requestAnimationFrame(() => {
-          setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
-          setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
-        });
       } else {
         globals.functions.importData({ apiError: data.status.errorDesc });
         trackEvent('bureau_offer_failed', { errorCode: data.status.errorCode });
@@ -615,6 +603,41 @@ function goToStep(stepIndex) {
 }
 
 /**
+ * Initialises the offer panel fields — bind on Initialize of the offer fragment/panel.
+ * importData for offer panel fields CANNOT be called before the panel renders because
+ * AEM Forms only registers fields in the model once their DOM exists. This function
+ * runs after the panel is in the DOM, reads the stored API values (offerAmount, tenure,
+ * rateOfInterest) and populates all display fields and sliders.
+ * @name initOfferPanel Populates offer panel display fields and sets sliders on load
+ * @param {scope} globals
+ * @return {string}
+ */
+function initOfferPanel(globals) {
+  const data = globals.functions.exportData();
+  const offerAmountNum = parseFloat(data.offerAmount) || 0;
+  const tenureNum = parseInt(data.tenure, 10) || 36;
+  const rateNum = parseFloat(data.rateOfInterest) || 0;
+  if (!offerAmountNum) return '';
+  const pf = calculateProcessingFee(offerAmountNum);
+  const formattedAmount = `₹${offerAmountNum.toLocaleString('en-IN')}`;
+  globals.functions.importData({
+    loan_amount_slider_value: offerAmountNum,
+    loan_tenure_slider_value: tenureNum,
+    emi_amount: calculateEMI(offerAmountNum, rateNum, tenureNum),
+    processingFees: pf,
+    taxes: calculateTaxes(pf),
+    summary_amount: formattedAmount,
+    offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
+    loan_tenure_display: `${tenureNum} months`,
+  });
+  requestAnimationFrame(() => {
+    setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
+    setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
+  });
+  return '';
+}
+
+/**
  * Recalculates EMI from current slider values — bind on Value Commit of both sliders
  * @name recalculateEMI Recalculates and stores EMI from current slider values
  * @param {scope} globals
@@ -693,6 +716,7 @@ export {
   proceedToNextStep,
   goToPrevStep,
   goToStep,
+  initOfferPanel,
   recalculateEMI,
   trackPageLoad,
   startOtpTimer,
