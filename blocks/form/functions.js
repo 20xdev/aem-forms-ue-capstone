@@ -613,10 +613,10 @@ function goToStep(stepIndex) {
  * @return {string}
  */
 function initOfferPanel(globals) {
-  const data = globals.functions.exportData();
-  const offerAmountNum = parseFloat(data.offerAmount) || 0;
-  const tenureNum = parseInt(data.tenure, 10) || 36;
-  const rateNum = parseFloat(data.rateOfInterest) || 0;
+  const fd = globals.functions.exportData();
+  const offerAmountNum = parseFloat(fd.offerAmount) || 0;
+  const tenureNum = parseInt(fd.tenure, 10) || 36;
+  const rateNum = parseFloat(fd.rateOfInterest) || 0;
   if (!offerAmountNum) return '';
   const pf = calculateProcessingFee(offerAmountNum);
   const formattedAmount = `₹${offerAmountNum.toLocaleString('en-IN')}`;
@@ -630,24 +630,33 @@ function initOfferPanel(globals) {
     offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
     loan_tenure_display: `${tenureNum} months`,
   });
-  requestAnimationFrame(() => {
+  setTimeout(() => {
     setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
     setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
-  });
+  }, 200);
   return '';
 }
 
 /**
- * Recalculates EMI from current slider values — bind on Value Commit of both sliders
- * @name recalculateEMI Recalculates and stores EMI from current slider values
+ * Recalculates EMI when either slider changes. Bind on is-changed of both sliders
+ * and pass both field values as Rule Editor parameters — this avoids exportData()
+ * reads inside the change cycle where the snapshot can lag (e.g. loan_tenure_slider_value
+ * returns 0 if the tenure slider was never user-committed in this session).
+ * Rule Editor binding (both sliders, same args):
+ *   is changed → recalculateEMI(loan_amount_slider_value, loan_tenure_slider_value, globals)
+ * @name recalculateEMI Recalculates EMI from current slider values
+ * @param {number} loanAmount Bind to loan_amount_slider_value in Rule Editor
+ * @param {number} tenureMonths Bind to loan_tenure_slider_value in Rule Editor
  * @param {scope} globals
  * @return {number} Updated EMI amount
  */
-function recalculateEMI(globals) {
-  const data = globals.functions.exportData();
-  const principal = parseFloat(data.loan_amount_slider_value) || 0;
-  const rate = parseFloat(data.rateOfInterest) || 0;
-  const tenure = parseInt(data.loan_tenure_slider_value, 10) || 0;
+function recalculateEMI(loanAmount, tenureMonths, globals) {
+  const principal = parseFloat(loanAmount) || 0;
+  const fd = globals.functions.exportData();
+  // tenureMonths may be 0 if the user never moved the tenure slider;
+  // fall back to the tenure field set by the bureau offer API
+  const tenure = parseInt(tenureMonths, 10) || parseInt(fd.tenure, 10) || 0;
+  const rate = parseFloat(fd.rateOfInterest) || 0;
   if (!principal || !tenure) return 0;
   const emi = calculateEMI(principal, rate, tenure);
   const pf = calculateProcessingFee(principal);
@@ -683,11 +692,14 @@ function finalizeAndProceedToPreview(globals) {
   const data = globals.functions.exportData();
   const principal = parseFloat(data.loan_amount_slider_value) || 0;
   const rate = parseFloat(data.rateOfInterest) || 0;
-  const tenure = parseInt(data.loan_tenure_slider_value, 10) || 0;
+  const tenure = parseInt(data.loan_tenure_slider_value, 10)
+    || parseInt(data.tenure, 10) || 0;
   if (!principal || !tenure) return '';
   const pf = calculateProcessingFee(principal);
   const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
   globals.functions.importData({
+    loan_amount_slider_value: principal,
+    loan_tenure_slider_value: tenure,
     emi_amount: calculateEMI(principal, rate, tenure),
     processingFees: pf,
     taxes: calculateTaxes(pf),
@@ -713,7 +725,8 @@ function initPreviewPanel(globals) {
   const data = globals.functions.exportData();
   const principal = parseFloat(data.loan_amount_slider_value) || 0;
   const rate = parseFloat(data.rateOfInterest) || 0;
-  const tenure = parseInt(data.loan_tenure_slider_value, 10) || 0;
+  const tenure = parseInt(data.loan_tenure_slider_value, 10)
+    || parseInt(data.tenure, 10) || 0;
   if (!principal || !tenure) return '';
   const pf = calculateProcessingFee(principal);
   const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
