@@ -792,3 +792,75 @@ main div.form-wrapper {
 main .form form select[multiple] {
     height: calc(42px + 50px);
 }
+
+/* ---- Review panel: plain-text display fields ---- */
+
+/* Strip the extra nesting margins from AEM's <p><p>…</p></p> output */
+main .form form .plain-text-wrapper p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Label text — the text node before the <br> inside the inner <p> */
+main .form form .plain-text-wrapper > p > p {
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+/* Value — the <b> tag following the <br> */
+main .form form .plain-text-wrapper > p > p > b {
+    display: block;
+    color: #111827;
+    font-size: 0.925rem;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* Give each field a subtle separator line at the bottom */
+main .form form .plain-text-wrapper {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Last field in a panel — no bottom border */
+main .form form .panel-wrapper > .plain-text-wrapper:last-child {
+    border-bottom: none;
+}
+
+/* ---- Salary Account Details section ---- */
+main .form form .field-salary-account-details {
+    margin-top: 0.5rem;
+}
+
+/* ---- Office Address section ---- */
+main .form form .field-office-address {
+    margin-top: 0.5rem;
+}
+
+/* Employer address value spans full width */
+main .form form .field-employer-address-review > p > p > b {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ---- Reference Details section ---- */
+main .form form .field-reference-details {
+    margin-top: 0.5rem;
+}
+
+/* ---- Verify Email section ---- */
+main .form form .field-verify-email {
+    margin-top: 0.5rem;
+}
+
+/* Verify email: button fills its grid cell */
+main .form form .field-verify-email .button-wrapper button {
+    width: 100%;
+}
+
+/* Responsive: smaller value text on mobile */
+@media (width <= 599px) {
+    main .form form .plain-text-wrapper > p > p > b {
+        font-size: 0.875rem;
+    }
+}

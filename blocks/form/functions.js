@@ -684,10 +684,119 @@ function goToStep(stepIndex) {
 }
 
 /**
+ * Populates all Review Details panel fields. Called from finalizeAndProceedToPreview
+ * 500 ms after navigation — do NOT bind to Initialize in Rule Editor because AEM Forms
+ * fires Initialize for all panels at page load before any data exists.
+ *
+ * In UE, author each review-screen value as a read-only text-input field using
+ * the names below (label text stays as authored static text beside it):
+ *
+ *   Loan Details      : review_loan_amount, review_emi_amount, review_tenure,
+ *                       review_processing_fee, review_rate_of_interest,
+ *                       review_employer_name, review_loan_type
+ *                       (Schedule of Charges = keep as authored static link)
+ *   Personal Details  : review_full_name, review_mobile, review_dob,
+ *                       review_pan, review_address, review_residence_type
+ *   Salary Account    : review_account_number, review_ifsc, review_bank_name
+ *   Office Address    : review_employer_address
+ *   Reference Details : review_reference_name, review_reference_mobile
+ *   Verify Email      : keep emailAddress / workEmail as regular text-input
+ *                       fields; wire Verify buttons to generateEmailOTP
+ * @name initPreviewPanel Populates Review Details panel fields on load
+ * @param {scope} globals
+ * @return {string}
+ */
+function initPreviewPanel(globals) {
+  const data = globals.functions.exportData();
+  const principal = parseFloat(data.loan_amount_slider_value) || 0;
+  const rate = parseFloat(data.rateOfInterest) || 0;
+  const tenure = parseInt(data.loan_tenure_slider_value, 10)
+    || parseInt(data.tenure, 10) || 0;
+  if (!principal || !tenure) return '';
+  const emi = calculateEMI(principal, rate, tenure);
+  const pf = calculateProcessingFee(principal);
+
+  // aadhaar_record_address is already a formatted string set by verifyOTPAndGetDemogDetails
+  const address = data.aadhaar_record_address || [
+    data.customerAddress1, data.customerAddress2, data.customerAddress3,
+    data.customerCity, data.customerState, data.zipCode,
+  ].filter(Boolean).join(', ');
+
+  // full_name_as_per_aadhaar is set by verifyOTPAndGetDemogDetails; fall back to PAN name
+  const fullName = data.full_name_as_per_aadhaar || [
+    data.first_name_pan || '',
+    data.last_name_pan || '',
+  ].filter(Boolean).join(' ');
+
+  // Map bank selector enum value to display name
+  const bankDisplayNames = {
+    hdfc: 'HDFC Bank',
+    icici: 'ICICI Bank',
+    axis: 'Axis Bank',
+    kotak: 'Kotak',
+    sbi: 'SBI',
+    bob: 'Bank of Baroda',
+    idfc: 'IDFC First',
+  };
+  const bankName = bankDisplayNames[data.selected_bank]
+    || data.other_bank_name || data.selected_bank || '';
+
+  // Mask PAN: ABCDE1234Z → ***** *234 Z (first 6 chars masked, last 4+final letter shown)
+  const pan = data.pan_number || '';
+  const maskedPan = pan.length >= 10
+    ? `***** *${pan.slice(-4, -1)} ${pan.slice(-1)}` : pan;
+
+  // Update offer-screen summary fields (real form fields — importData works for these)
+  globals.functions.importData({
+    processingFees: pf,
+    taxes: calculateTaxes(pf),
+    emi_amount: emi,
+    summary_amount: `₹${principal.toLocaleString('en-IN')}`,
+  });
+
+  // Review fields are plain-text-wrapper elements (no name attribute) — importData cannot
+  // reach them. Use DOM manipulation targeting the <b> tag inside each field's <p>.
+  // CSS class name = field-{field-name-with-hyphens}, e.g. field-loan-amount-review.
+  const setReview = (cssName, val) => {
+    const el = document.querySelector(`.field-${cssName} b`);
+    if (el) el.textContent = val || '';
+  };
+
+  // Loan Details
+  setReview('loan-amount-review', `₹${principal.toLocaleString('en-IN')}`);
+  setReview('emi-amount-review', `₹${emi.toLocaleString('en-IN')}`);
+  setReview('tenure-review', `${tenure} months`);
+  setReview('processing-fee-review', `₹${pf.toLocaleString('en-IN')}`);
+  setReview('rate-of-interest-review', data.rateOfInterest || '');
+  setReview('employer-name-review', data.employer_company_name || '');
+  setReview('loan-type-review', data.offerType || '');
+
+  // Personal Details
+  setReview('full-name-review', fullName);
+  setReview('mobile-review', data.mobileNo ? `+91 ${data.mobileNo}` : '');
+  setReview('dob-review', data.customerDob || '');
+  setReview('pan-review', maskedPan);
+  setReview('address-review', address);
+  setReview('residence-type-review', data.residenceType || '');
+
+  // Salary Account Details
+  setReview('account-number-review', data.accountNumber || '');
+  setReview('ifsc-review', data.ifscCode || data.ifsc || '');
+  setReview('bank-name-review', bankName);
+
+  // Office Address
+  setReview('employer-address-review', data.employerAddress || '');
+
+  // Reference Details
+  setReview('reference-name-review', data.referenceName || '');
+  setReview('reference-mobile-review', data.referenceMobile || '');
+
+  return '';
+}
+
+/**
  * Persists the user's final loan choices to the form model, then advances to preview.
  * Bind on the offer panel "Next" button Click instead of proceedToNextStep.
- * recalculateEMI only updates the DOM to avoid re-renders; this function is the single
- * point where offer choices are written to the model for the preview and submission steps.
  * @name finalizeAndProceedToPreview Saves offer choices to model and navigates to preview
  * @param {scope} globals
  * @return {string}
@@ -711,34 +820,9 @@ function finalizeAndProceedToPreview(globals) {
     offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
   });
   document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
-  return '';
-}
-
-/**
- * Initialises preview panel display fields — bind on Initialize of the preview fragment.
- * Fields like processingFees and taxes only exist on the preview screen, so they cannot
- * be set by importData while the offer panel is active. This function reads the final
- * loan choices from the model (stored by finalizeAndProceedToPreview) and populates all
- * preview-only derived fields.
- * @name initPreviewPanel Populates preview panel derived fields on load
- * @param {scope} globals
- * @return {string}
- */
-function initPreviewPanel(globals) {
-  const data = globals.functions.exportData();
-  const principal = parseFloat(data.loan_amount_slider_value) || 0;
-  const rate = parseFloat(data.rateOfInterest) || 0;
-  const tenure = parseInt(data.loan_tenure_slider_value, 10)
-    || parseInt(data.tenure, 10) || 0;
-  if (!principal || !tenure) return '';
-  const pf = calculateProcessingFee(principal);
-  const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
-  globals.functions.importData({
-    processingFees: pf,
-    taxes: calculateTaxes(pf),
-    emi_amount: calculateEMI(principal, rate, tenure),
-    summary_amount: formattedAmount,
-  });
+  // AEM Forms fires Initialize for all panels at page load — call initPreviewPanel
+  // here after navigation so the review panel is in the DOM and data is ready.
+  setTimeout(() => initPreviewPanel(globals), 500);
   return '';
 }
 
