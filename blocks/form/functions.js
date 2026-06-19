@@ -58,7 +58,8 @@ function setSlider(name, min, max, value) {
   input.min = String(min);
   input.max = String(max);
   input.value = String(value);
-  input.dispatchEvent(new Event('input'));
+  // bubbles:true so the AEM Forms form-level model listener picks up the change
+  input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 // processingFee = 1.5% of principal; taxes = 18% GST on processing fee.
@@ -623,7 +624,9 @@ function recalculateEMI(globals) {
   const data = globals.functions.exportData();
   const principal = parseFloat(data.loan_amount_slider_value) || 0;
   const rate = parseFloat(data.rateOfInterest) || 0;
-  const tenure = parseInt(data.loan_tenure_slider_value, 10) || 1;
+  const tenure = parseInt(data.loan_tenure_slider_value, 10) || 0;
+  // bail if slider values haven't been populated yet
+  if (!principal || !tenure) return 0;
   const emi = calculateEMI(principal, rate, tenure);
   const pf = calculateProcessingFee(principal);
   const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
@@ -636,6 +639,14 @@ function recalculateEMI(globals) {
     loan_tenure_display: `${tenure} months`,
   });
   trackEvent('emi_recalculated', { principal, tenure });
+  // importData may trigger a form re-render that resets slider DOM to authored defaults.
+  // Re-anchor both sliders after the render cycle to restore the user's chosen position.
+  const maxAmount = parseFloat(data.offerAmount) || principal;
+  const maxTenure = parseInt(data.tenure, 10) || tenure;
+  requestAnimationFrame(() => {
+    setSlider('loan_amount_slider_value', 50000, maxAmount, principal);
+    setSlider('loan_tenure_slider_value', 12, maxTenure, tenure);
+  });
   return emi;
 }
 
