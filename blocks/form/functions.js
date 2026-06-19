@@ -648,29 +648,83 @@ function recalculateEMI(globals) {
   const principal = parseFloat(data.loan_amount_slider_value) || 0;
   const rate = parseFloat(data.rateOfInterest) || 0;
   const tenure = parseInt(data.loan_tenure_slider_value, 10) || 0;
-  // bail if slider values haven't been populated yet
   if (!principal || !tenure) return 0;
   const emi = calculateEMI(principal, rate, tenure);
   const pf = calculateProcessingFee(principal);
   const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
+  // DOM-only updates: importData triggers a full panel re-render that snaps sliders
+  // back to authored defaults. Directly setting input.value skips the model update
+  // and avoids the re-render entirely. finalizeAndProceedToPreview persists to model.
+  [
+    ['emi_amount', emi],
+    ['processingFees', pf],
+    ['taxes', calculateTaxes(pf)],
+    ['summary_amount', formattedAmount],
+    ['offer_banner_text', `You can get a loan up to ${formattedAmount}!`],
+    ['loan_tenure_display', `${tenure} months`],
+  ].forEach(([name, val]) => {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (el) el.value = String(val);
+  });
+  trackEvent('emi_recalculated', { principal, tenure });
+  return emi;
+}
+
+/**
+ * Persists the user's final loan choices to the form model, then advances to preview.
+ * Bind on the offer panel "Next" button Click instead of proceedToNextStep.
+ * recalculateEMI only updates the DOM to avoid re-renders; this function is the single
+ * point where offer choices are written to the model for the preview and submission steps.
+ * @name finalizeAndProceedToPreview Saves offer choices to model and navigates to preview
+ * @param {scope} globals
+ * @return {string}
+ */
+function finalizeAndProceedToPreview(globals) {
+  const data = globals.functions.exportData();
+  const principal = parseFloat(data.loan_amount_slider_value) || 0;
+  const rate = parseFloat(data.rateOfInterest) || 0;
+  const tenure = parseInt(data.loan_tenure_slider_value, 10) || 0;
+  if (!principal || !tenure) return '';
+  const pf = calculateProcessingFee(principal);
+  const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
   globals.functions.importData({
-    emi_amount: emi,
+    emi_amount: calculateEMI(principal, rate, tenure),
     processingFees: pf,
     taxes: calculateTaxes(pf),
     summary_amount: formattedAmount,
     offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
     loan_tenure_display: `${tenure} months`,
   });
-  trackEvent('emi_recalculated', { principal, tenure });
-  // importData may trigger a form re-render that resets slider DOM to authored defaults.
-  // Re-anchor both sliders after the render cycle to restore the user's chosen position.
-  const maxAmount = parseFloat(data.offerAmount) || principal;
-  const maxTenure = parseInt(data.tenure, 10) || tenure;
-  requestAnimationFrame(() => {
-    setSlider('loan_amount_slider_value', 50000, maxAmount, principal);
-    setSlider('loan_tenure_slider_value', 12, maxTenure, tenure);
+  document.dispatchEvent(new CustomEvent('loan-wizard:proceed'));
+  return '';
+}
+
+/**
+ * Initialises preview panel display fields — bind on Initialize of the preview fragment.
+ * Fields like processingFees and taxes only exist on the preview screen, so they cannot
+ * be set by importData while the offer panel is active. This function reads the final
+ * loan choices from the model (stored by finalizeAndProceedToPreview) and populates all
+ * preview-only derived fields.
+ * @name initPreviewPanel Populates preview panel derived fields on load
+ * @param {scope} globals
+ * @return {string}
+ */
+function initPreviewPanel(globals) {
+  const data = globals.functions.exportData();
+  const principal = parseFloat(data.loan_amount_slider_value) || 0;
+  const rate = parseFloat(data.rateOfInterest) || 0;
+  const tenure = parseInt(data.loan_tenure_slider_value, 10) || 0;
+  if (!principal || !tenure) return '';
+  const pf = calculateProcessingFee(principal);
+  const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
+  globals.functions.importData({
+    processingFees: pf,
+    taxes: calculateTaxes(pf),
+    emi_amount: calculateEMI(principal, rate, tenure),
+    summary_amount: formattedAmount,
+    loan_tenure_display: `${tenure} months`,
   });
-  return emi;
+  return '';
 }
 
 /**
@@ -718,6 +772,8 @@ export {
   goToStep,
   initOfferPanel,
   recalculateEMI,
+  finalizeAndProceedToPreview,
+  initPreviewPanel,
   trackPageLoad,
   startOtpTimer,
 };
