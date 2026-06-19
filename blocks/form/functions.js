@@ -616,26 +616,23 @@ function goToStep(stepIndex) {
 function recalculateEMI(loanAmount, tenureMonths, globals) {
   const principal = parseFloat(loanAmount) || 0;
   const fd = globals.functions.exportData();
-  // tenureMonths may be null if the tenure slider was never user-committed;
-  // fall back to the tenure field set by the bureau offer API
+  // tenureMonths comes directly from the slider DOM value so it is never null here;
+  // fall back to the tenure field set by the bureau offer API just in case.
   const tenure = parseInt(tenureMonths, 10) || parseInt(fd.tenure, 10) || 0;
   const rate = parseFloat(fd.rateOfInterest) || 0;
   if (!principal || !tenure) return '';
   const emi = calculateEMI(principal, rate, tenure);
   const pf = calculateProcessingFee(principal);
   const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
-  // DOM-only updates: importData triggers a full panel re-render that snaps sliders
-  // back to authored defaults. Directly setting input.value skips the model update
-  // and avoids the re-render entirely. finalizeAndProceedToPreview persists to model.
-  [
-    ['emi_amount', emi],
-    ['processingFees', pf],
-    ['taxes', calculateTaxes(pf)],
-    ['summary_amount', formattedAmount],
-    ['offer_banner_text', `You can get a loan up to ${formattedAmount}!`],
-  ].forEach(([name, val]) => {
-    const el = document.querySelector(`[name="${name}"]`);
-    if (el) el.value = String(val);
+  // importData with display fields only — slider keys are intentionally omitted.
+  // Including loan_amount_slider_value/loan_tenure_slider_value would overwrite the
+  // user's current slider position with the original offer value, causing snap-back.
+  globals.functions.importData({
+    emi_amount: emi,
+    processingFees: pf,
+    taxes: calculateTaxes(pf),
+    summary_amount: formattedAmount,
+    offer_banner_text: `You can get a loan up to ${formattedAmount}!`,
   });
   trackEvent('emi_recalculated', { principal, tenure });
   return '';
