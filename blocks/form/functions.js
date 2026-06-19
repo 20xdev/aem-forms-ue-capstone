@@ -603,6 +603,45 @@ function goToStep(stepIndex) {
 }
 
 /**
+ * Recalculates EMI from current slider DOM values. Called directly from input event
+ * listeners wired in initOfferPanel — NOT from Rule Editor. Using Rule Editor
+ * "Set Value of X to recalculateEMI()" causes an infinite re-fire loop because
+ * the return value gets written back into a field that re-triggers the rule.
+ * @name recalculateEMI Recalculates EMI from current slider values
+ * @param {number} loanAmount Current loan_amount_slider_value (DOM value)
+ * @param {number} tenureMonths Current loan_tenure_slider_value (DOM value)
+ * @param {scope} globals
+ * @return {string}
+ */
+function recalculateEMI(loanAmount, tenureMonths, globals) {
+  const principal = parseFloat(loanAmount) || 0;
+  const fd = globals.functions.exportData();
+  // tenureMonths may be null if the tenure slider was never user-committed;
+  // fall back to the tenure field set by the bureau offer API
+  const tenure = parseInt(tenureMonths, 10) || parseInt(fd.tenure, 10) || 0;
+  const rate = parseFloat(fd.rateOfInterest) || 0;
+  if (!principal || !tenure) return '';
+  const emi = calculateEMI(principal, rate, tenure);
+  const pf = calculateProcessingFee(principal);
+  const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
+  // DOM-only updates: importData triggers a full panel re-render that snaps sliders
+  // back to authored defaults. Directly setting input.value skips the model update
+  // and avoids the re-render entirely. finalizeAndProceedToPreview persists to model.
+  [
+    ['emi_amount', emi],
+    ['processingFees', pf],
+    ['taxes', calculateTaxes(pf)],
+    ['summary_amount', formattedAmount],
+    ['offer_banner_text', `You can get a loan up to ${formattedAmount}!`],
+  ].forEach(([name, val]) => {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (el) el.value = String(val);
+  });
+  trackEvent('emi_recalculated', { principal, tenure });
+  return '';
+}
+
+/**
  * Initialises the offer panel fields — bind on Initialize of the offer fragment/panel.
  * importData for offer panel fields CANNOT be called before the panel renders because
  * AEM Forms only registers fields in the model once their DOM exists. This function
@@ -632,48 +671,13 @@ function initOfferPanel(globals) {
   setTimeout(() => {
     setSlider('loan_amount_slider_value', 50000, offerAmountNum, offerAmountNum);
     setSlider('loan_tenure_slider_value', 12, tenureNum, tenureNum);
+    // Wire live recalculation directly to slider input events — no Rule Editor needed.
+    const amtEl = document.querySelector('[name="loan_amount_slider_value"]');
+    const tenEl = document.querySelector('[name="loan_tenure_slider_value"]');
+    const recalc = () => recalculateEMI(amtEl?.value, tenEl?.value, globals);
+    amtEl?.addEventListener('input', recalc);
+    tenEl?.addEventListener('input', recalc);
   }, 200);
-  return '';
-}
-
-/**
- * Recalculates EMI when either slider changes. Bind on is-changed of both sliders
- * and pass both field values as Rule Editor parameters — this avoids exportData()
- * reads inside the change cycle where the snapshot can lag (e.g. loan_tenure_slider_value
- * returns 0 if the tenure slider was never user-committed in this session).
- * Rule Editor binding (both sliders, same args):
- *   is changed → recalculateEMI(loan_amount_slider_value, loan_tenure_slider_value, globals)
- * @name recalculateEMI Recalculates EMI from current slider values
- * @param {number} loanAmount Bind to loan_amount_slider_value in Rule Editor
- * @param {number} tenureMonths Bind to loan_tenure_slider_value in Rule Editor
- * @param {scope} globals
- * @return {string} Empty string — use Call Function, not Set Value, in Rule Editor
- */
-function recalculateEMI(loanAmount, tenureMonths, globals) {
-  const principal = parseFloat(loanAmount) || 0;
-  const fd = globals.functions.exportData();
-  // tenureMonths may be null if the tenure slider was never user-committed;
-  // fall back to the tenure field set by the bureau offer API
-  const tenure = parseInt(tenureMonths, 10) || parseInt(fd.tenure, 10) || 0;
-  const rate = parseFloat(fd.rateOfInterest) || 0;
-  if (!principal || !tenure) return '';
-  const emi = calculateEMI(principal, rate, tenure);
-  const pf = calculateProcessingFee(principal);
-  const formattedAmount = `₹${principal.toLocaleString('en-IN')}`;
-  // DOM-only updates: importData triggers a full panel re-render that snaps sliders
-  // back to authored defaults. Directly setting input.value skips the model update
-  // and avoids the re-render entirely. finalizeAndProceedToPreview persists to model.
-  [
-    ['emi_amount', emi],
-    ['processingFees', pf],
-    ['taxes', calculateTaxes(pf)],
-    ['summary_amount', formattedAmount],
-    ['offer_banner_text', `You can get a loan up to ${formattedAmount}!`],
-  ].forEach(([name, val]) => {
-    const el = document.querySelector(`[name="${name}"]`);
-    if (el) el.value = String(val);
-  });
-  trackEvent('emi_recalculated', { principal, tenure });
   return '';
 }
 
